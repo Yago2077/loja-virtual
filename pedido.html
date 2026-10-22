@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meu pedido · Minha Loja</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      .pedido-box {
+        background: #fff;
+        border: 1px solid var(--borda);
+        border-radius: var(--raio);
+        padding: 32px;
+        box-shadow: var(--sombra-sm);
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .status-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+      .status-pago {
+        background: #ecfdf5;
+        color: #065f46;
+      }
+      .status-pendente {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .status-cancelado {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .status-outro {
+        background: #eff6ff;
+        color: #1e40af;
+      }
+      .timeline {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+      }
+      .timeline li {
+        padding: 12px 0 12px 28px;
+        border-left: 2px solid var(--borda);
+        position: relative;
+      }
+      .timeline li::before {
+        content: "";
+        position: absolute;
+        left: -7px;
+        top: 18px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--primaria);
+      }
+      .timeline li:first-child::before {
+        background: var(--sucesso);
+      }
+      .itens-list {
+        margin: 16px 0;
+        padding: 0;
+        list-style: none;
+      }
+      .itens-list li {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--borda);
+        display: flex;
+        justify-content: space-between;
+      }
+      .totais {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 2px solid var(--borda);
+      }
+      .totais div {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+      }
+      .totais .total {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--primaria);
+        padding-top: 12px;
+      }
+    </style>
+  </head>
+  <body data-page="pedido">
+    <header id="app-header"></header>
+
+    <main class="section">
+      <div class="container">
+        <div id="pedidoContainer">
+          <p class="muted" style="text-align: center; padding: 60px 0">
+            Carregando pedido...
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer id="app-footer"></footer>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+      async function carregarPedido() {
+        const id = new URLSearchParams(location.search).get("id");
+        const box = document.getElementById("pedidoContainer");
+
+        if (!id) {
+          box.innerHTML = '<p class="vazio">Pedido não especificado.</p>';
+          return;
+        }
+
+        try {
+          const p = await API.getPedido(id);
+
+          const statusMap = {
+            pendente_pagamento: ["Pendente de pagamento", "status-pendente"],
+            pago: ["Pago", "status-pago"],
+            em_separacao: ["Em separação", "status-outro"],
+            enviado: ["Enviado", "status-outro"],
+            entregue: ["Entregue", "status-pago"],
+            cancelado: ["Cancelado", "status-cancelado"],
+            reembolsado: ["Reembolsado", "status-cancelado"],
+          };
+          const [label, cls] = statusMap[p.status] || [
+            p.status,
+            "status-outro",
+          ];
+
+          const itensHtml = p.order_items
+            .map(
+              (i) => `
+          <li>
+            <span>${i.quantidade}× ${i.produto_nome}</span>
+            <strong>R$ ${Number(i.subtotal).toFixed(2)}</strong>
+          </li>`,
+            )
+            .join("");
+
+          const historico = (p.order_status_history || [])
+            .sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em))
+            .map(
+              (h) =>
+                `<li><strong>${h.status}</strong> · ${new Date(h.criado_em).toLocaleString("pt-BR")}${h.observacao ? " — " + h.observacao : ""}</li>`,
+            )
+            .join("");
+
+          box.innerHTML = `
+          <div class="pedido-box">
+            <div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+              <div>
+                <h1 style="margin:0 0 6px;font-size:1.8rem">Pedido #${p.numero}</h1>
+                <p class="muted" style="margin:0">${new Date(p.criado_em).toLocaleString("pt-BR")}</p>
+              </div>
+              <span class="status-badge ${cls}">${label}</span>
+            </div>
+
+            <p><strong>Pagamento:</strong> ${p.payment_method} (${p.payment_timing === "online" ? "pelo site" : "na entrega"}) — <em>${p.payment_status}</em></p>
+
+            ${p.codigo_rastreio ? `<p><strong>Rastreio:</strong> ${p.codigo_rastreio}${p.transportadora ? " · " + p.transportadora : ""}</p>` : ""}
+
+            <h2 style="margin-top:28px">Itens</h2>
+            <ul class="itens-list">${itensHtml}</ul>
+
+            <div class="totais">
+              <div><span>Subtotal</span><span>R$ ${Number(p.subtotal).toFixed(2)}</span></div>
+              ${Number(p.desconto) > 0 ? `<div><span>Desconto${p.coupon_codigo ? " (" + p.coupon_codigo + ")" : ""}</span><span style="color:var(--sucesso)">- R$ ${Number(p.desconto).toFixed(2)}</span></div>` : ""}
+              <div><span>Frete</span><span>${Number(p.frete) > 0 ? "R$ " + Number(p.frete).toFixed(2) : "Grátis"}</span></div>
+              <div class="total"><span>Total</span><span>R$ ${Number(p.total).toFixed(2)}</span></div>
+            </div>
+
+            <h2 style="margin-top:28px">Endereço de entrega</h2>
+            <p class="muted">
+              ${p.endereco_logradouro}, ${p.endereco_numero}${p.endereco_complemento ? " — " + p.endereco_complemento : ""}<br>
+              ${p.endereco_bairro} · ${p.endereco_cidade}/${p.endereco_estado}<br>
+              CEP ${p.endereco_cep}
+            </p>
+
+            ${historico ? `<h2 style="margin-top:28px">Histórico</h2><ul class="timeline">${historico}</ul>` : ""}
+
+            <div style="margin-top:32px;text-align:center">
+              <a href="produtos.html" class="btn">Continuar comprando</a>
+            </div>
+          </div>`;
+        } catch (err) {
+          box.innerHTML = `<p class="vazio">Não foi possível carregar o pedido. ${err.message}</p>`;
+        }
+      }
+
+      APP_READY.then(carregarPedido);
+    </script>
+  </body>
+</html>

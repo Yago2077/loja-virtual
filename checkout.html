@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Finalizar Pedido · Minha Loja</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body data-page="checkout">
+    <header id="app-header"></header>
+
+    <main>
+      <section class="page-head">
+        <div class="container">
+          <h1>Finalizar pedido</h1>
+          <p class="muted">Revise os itens, escolha o pagamento e confirme.</p>
+        </div>
+      </section>
+
+      <section class="section" style="padding-top: 24px">
+        <div class="container checkout-grid">
+          <div class="checkout-main">
+            <div class="checkout-card">
+              <h2>1. Seus itens</h2>
+              <div id="checkoutItems"></div>
+            </div>
+
+            <div class="checkout-card">
+              <h2>2. Seus dados</h2>
+              <div class="form-row">
+                <div class="field">
+                  <label>Nome completo *</label
+                  ><input
+                    id="cNome"
+                    required
+                    placeholder="Nome e sobrenome"
+                    maxlength="100"
+                  />
+                </div>
+                <div class="field">
+                  <label>E-mail *</label
+                  ><input
+                    id="cEmail"
+                    type="email"
+                    required
+                    placeholder="seu@email.com"
+                    maxlength="120"
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label>WhatsApp *</label
+                  ><input
+                    id="cFone"
+                    required
+                    placeholder="(00) 00000-0000"
+                    maxlength="20"
+                    inputmode="tel"
+                  />
+                </div>
+                <div class="field">
+                  <label>CPF (opcional)</label
+                  ><input
+                    id="cCpf"
+                    placeholder="000.000.000-00"
+                    maxlength="14"
+                    inputmode="numeric"
+                  />
+                </div>
+              </div>
+              <div class="field">
+                <label>Observações (opcional)</label
+                ><textarea
+                  id="cObs"
+                  rows="2"
+                  placeholder="Ponto de referência, horário, etc."
+                  maxlength="300"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="checkout-card">
+              <h2>3. Endereço de entrega</h2>
+              <div class="form-row">
+                <div class="field">
+                  <label>CEP *</label
+                  ><input
+                    id="cCep"
+                    required
+                    placeholder="00000-000"
+                    maxlength="9"
+                    inputmode="numeric"
+                  />
+                </div>
+                <div class="field">
+                  <label>Cidade *</label
+                  ><input
+                    id="cCidade"
+                    required
+                    placeholder="São Paulo"
+                    maxlength="60"
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label>UF *</label
+                  ><input
+                    id="cUF"
+                    required
+                    placeholder="SP"
+                    maxlength="2"
+                    style="text-transform: uppercase"
+                  />
+                </div>
+                <div class="field">
+                  <label>Bairro *</label
+                  ><input
+                    id="cBairro"
+                    required
+                    placeholder="Centro"
+                    maxlength="60"
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field">
+                  <label>Rua / Logradouro *</label
+                  ><input
+                    id="cEnd"
+                    required
+                    placeholder="Rua das Flores"
+                    maxlength="120"
+                  />
+                </div>
+                <div class="field">
+                  <label>Número *</label
+                  ><input id="cNum" required placeholder="123" maxlength="20" />
+                </div>
+              </div>
+              <div class="field">
+                <label>Complemento</label
+                ><input
+                  id="cComp"
+                  placeholder="Apto 42, bloco B"
+                  maxlength="80"
+                />
+              </div>
+            </div>
+
+            <div class="checkout-card">
+              <h2>4. Forma de pagamento</h2>
+              <div class="pay-grid">
+                <label class="pay-opt"
+                  ><input type="radio" name="payMethod" value="pix" /><span
+                    class="pay-ico"
+                    >🔷</span
+                  >
+                  <div>
+                    <strong>PIX</strong><small>Aprovação imediata</small>
+                  </div></label
+                >
+                <label class="pay-opt"
+                  ><input type="radio" name="payMethod" value="credito" /><span
+                    class="pay-ico"
+                    >💳</span
+                  >
+                  <div>
+                    <strong>Crédito</strong><small>Via Mercado Pago</small>
+                  </div></label
+                >
+                <label class="pay-opt"
+                  ><input type="radio" name="payMethod" value="debito" /><span
+                    class="pay-ico"
+                    >💳</span
+                  >
+                  <div>
+                    <strong>Débito</strong><small>Via Mercado Pago</small>
+                  </div></label
+                >
+                <label class="pay-opt"
+                  ><input type="radio" name="payMethod" value="dinheiro" /><span
+                    class="pay-ico"
+                    >💵</span
+                  >
+                  <div>
+                    <strong>Dinheiro</strong><small>Pagamento na entrega</small>
+                  </div></label
+                >
+              </div>
+            </div>
+
+            <div class="checkout-card" id="timingSection" hidden>
+              <h2>5. Quando pagar?</h2>
+              <div class="pay-grid two">
+                <label class="pay-opt"
+                  ><input type="radio" name="payTiming" value="online" /><span
+                    class="pay-ico"
+                    >🌐</span
+                  >
+                  <div>
+                    <strong>Pagar agora</strong><small>Pelo Mercado Pago</small>
+                  </div></label
+                >
+                <label class="pay-opt"
+                  ><input type="radio" name="payTiming" value="entrega" /><span
+                    class="pay-ico"
+                    >🚚</span
+                  >
+                  <div>
+                    <strong>Pagar na entrega</strong><small>Ao receber</small>
+                  </div></label
+                >
+              </div>
+            </div>
+
+            <div class="checkout-card">
+              <h2>6. Cupom de desconto</h2>
+              <div style="display: flex; gap: 8px">
+                <input
+                  id="cupomInput"
+                  placeholder="Digite o código (ex: BEMVINDO10)"
+                  style="
+                    flex: 1;
+                    padding: 11px 14px;
+                    border: 1px solid var(--borda);
+                    border-radius: 10px;
+                    font-family: inherit;
+                  "
+                />
+                <button type="button" class="btn btn-ghost" id="cupomBtn">
+                  Aplicar
+                </button>
+              </div>
+              <small
+                id="cupomMsg"
+                class="muted"
+                style="display: block; margin-top: 8px"
+              ></small>
+            </div>
+          </div>
+
+          <aside class="checkout-summary">
+            <h2>Resumo</h2>
+            <div id="summaryItems"></div>
+            <div class="summary-row">
+              <span>Subtotal</span><span id="subTotal">R$ 0,00</span>
+            </div>
+            <div class="summary-row" id="descontoRow" hidden>
+              <span>Desconto</span
+              ><span id="descontoVal" style="color: var(--sucesso)"
+                >- R$ 0,00</span
+              >
+            </div>
+            <div class="summary-row"><span>Frete</span><span>Grátis</span></div>
+            <div class="summary-total">
+              <span>Total</span><strong id="summaryTotal">R$ 0,00</strong>
+            </div>
+            <button class="btn btn-block" id="confirmBtn" disabled>
+              Confirmar pedido
+            </button>
+            <p class="muted small" style="text-align: center; margin-top: 10px">
+              Ao confirmar, você será redirecionado para o pagamento seguro do
+              Mercado Pago (ou para a página do pedido, no caso de pagamento na
+              entrega).
+            </p>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer id="app-footer"></footer>
+    <aside class="cart-drawer" id="cartDrawer" aria-hidden="true"></aside>
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="modal" aria-hidden="true">
+      <div class="modal-box" id="modalBox"></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

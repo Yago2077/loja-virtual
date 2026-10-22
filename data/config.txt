@@ -1,0 +1,18 @@
+# ============================================
+# CONFIGURAÇÃO DA LOJA (visual e contato)
+# ============================================
+
+nome_loja=Minha Loja
+slogan=Qualidade e preço justo para você
+descricao=Produtos selecionados com entrega rápida e pagamento seguro.
+
+cor_primaria=#4f46e5
+cor_secundaria=#4338ca
+cor_destaque=#f59e0b
+
+whatsapp=5519920018893
+whatsapp_display=(19) 92001-8893
+email=contato@minhaloja.com
+instagram=@minhaloja
+endereco=Av. Paulista, 1000 - São Paulo/SP
+horario=Seg. a Sex., 9h às 18h · Sáb. 9h às 13h

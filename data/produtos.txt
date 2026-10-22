@@ -1,0 +1,19 @@
+# ============================================
+# BANCO DE PRODUTOS
+# ============================================
+# FORMATO (separar campos com |):
+# id|nome|preco|categoria|imagem|descricao|estoque|destaque
+#
+# - Linhas que começam com # são ignoradas
+# - "imagem" pode ser URL ou caminho local (ex: img/camiseta.jpg)
+# - Deixe em branco se não tiver imagem (mostra letra inicial)
+# - estoque = 0 significa "Esgotado"
+# ============================================
+
+1|Camiseta Básica|59.90|Roupas|https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600|Algodão 100% penteado, super confortável.|15|sim
+2|Caneca Personalizada|39.90|Casa|https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=600|Cerâmica de alta qualidade, 300ml.|22|sim
+3|Fone Bluetooth|199.90|Eletrônicos|https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600|Som cristalino e bateria de 20h.|8|sim
+4|Mochila Urbana|149.90|Acessórios|https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600|Resistente à água, compartimento para notebook.|5|não
+5|Squeeze Térmico|79.90|Casa||Aço inox, mantém gelado por 12h.|0|não
+6|Caderno Premium|34.90|Papelaria||Capa dura, 200 páginas pautadas.|40|não
+7|Produto Teste|0.05|???||Eh, não era pra você estar lendo isso...|999|não

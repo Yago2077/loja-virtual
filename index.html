@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Início · Minha Loja</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body data-page="home">
+    <header id="app-header"></header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-inner">
+          <div class="hero-text">
+            <span class="badge">✨ Novidades toda semana</span>
+            <h1 id="heroTitulo">Sua loja favorita online</h1>
+            <p id="heroSlogan" class="muted">
+              Produtos de qualidade, entrega rápida e pagamento seguro.
+            </p>
+            <div class="hero-actions">
+              <a href="produtos.html" class="btn btn-lg">Ver produtos →</a>
+              <a href="sobre.html" class="btn btn-ghost">Conheça a loja</a>
+            </div>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <div class="hero-shape"></div>
+            <div class="hero-shape s2"></div>
+            <div class="hero-shape s3"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="trust">
+        <div class="container trust-grid">
+          <div class="trust-item">
+            <span class="trust-ico">🔒</span>
+            <div>
+              <strong>Pagamento seguro</strong
+              ><small>PIX, cartão e dinheiro</small>
+            </div>
+          </div>
+          <div class="trust-item">
+            <span class="trust-ico">🚚</span>
+            <div>
+              <strong>Entrega rápida</strong><small>Envio em 24h úteis</small>
+            </div>
+          </div>
+          <div class="trust-item">
+            <span class="trust-ico">↩️</span>
+            <div>
+              <strong>Troca fácil</strong><small>7 dias para trocar</small>
+            </div>
+          </div>
+          <div class="trust-item">
+            <span class="trust-ico">💬</span>
+            <div>
+              <strong>Atendimento humano</strong
+              ><small>Por WhatsApp e e-mail</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="section-head">
+            <div>
+              <h2>Destaques da semana</h2>
+              <p class="muted">Os produtos mais procurados pelos clientes.</p>
+            </div>
+            <a href="produtos.html" class="link">Ver todos →</a>
+          </div>
+          <div class="grid" id="homeGrid"></div>
+        </div>
+      </section>
+
+      <section class="section alt">
+        <div class="container sobre-mini">
+          <div>
+            <h2>Por que comprar com a gente?</h2>
+            <p class="muted">
+              Somos uma loja independente que preza pela qualidade dos produtos
+              e pelo atendimento próximo. Cada pedido é conferido à mão antes do
+              envio.
+            </p>
+            <ul class="checks">
+              <li>✔ Produtos selecionados um a um</li>
+              <li>✔ Embalagem reforçada</li>
+              <li>✔ Suporte direto com o lojista</li>
+              <li>✔ Nota fiscal em todos os pedidos</li>
+            </ul>
+            <a href="sobre.html" class="btn btn-ghost">Nossa história</a>
+          </div>
+          <div class="sobre-mini-art">
+            <div class="stat">
+              <strong>+2.500</strong><small>pedidos entregues</small>
+            </div>
+            <div class="stat">
+              <strong>4.9★</strong><small>avaliação média</small>
+            </div>
+            <div class="stat">
+              <strong>24h</strong><small>envio médio</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section cta-section">
+        <div class="container cta-box">
+          <div>
+            <h2>Pronto para comprar?</h2>
+            <p class="muted">
+              Explore a vitrine completa e finalize em poucos cliques.
+            </p>
+          </div>
+          <a href="produtos.html" class="btn btn-lg">Ver produtos →</a>
+        </div>
+      </section>
+    </main>
+
+    <footer id="app-footer"></footer>
+    <aside class="cart-drawer" id="cartDrawer" aria-hidden="true"></aside>
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="modal" aria-hidden="true">
+      <div class="modal-box" id="modalBox"></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>
