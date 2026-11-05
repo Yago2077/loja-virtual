@@ -283,23 +283,23 @@ function initContato() {
   });
 }
 
-/* ==================== CHECKOUT (Nova Lógica) ==================== */
+/* ==================== CHECKOUT ==================== */
 let checkoutState = { timing: null, method: null };
 let cupomAplicado = null;
+let pedidoPixIdGlobal = null;
+let pixCheckInterval = null;
 
 function initCheckout() {
   if (!$(".checkout-main")) return;
   renderCheckout();
 
-  // Listener para QUANDO PAGAR
   $$('input[name="payTiming"]').forEach((r) => r.addEventListener("change", (e) => {
     checkoutState.timing = e.target.value;
-    checkoutState.method = null; // Reseta o método
+    checkoutState.method = null;
     renderPaymentMethods();
     updateConfirmBtn();
   }));
 
-  // Cupom
   $("#cupomBtn")?.addEventListener("click", async () => {
     const codigo = $("#cupomInput").value.trim();
     if (!codigo) return;
@@ -309,8 +309,7 @@ function initCheckout() {
     renderCheckout();
   });
 
-  // Campos do formulário
-  ["#cNome", "#cEmail", "#cFone", "#cCep", "#cCidade", "#cUF", "#cBairro", "#cEnd", "#cNum"].forEach((sel) => $(sel)?.addEventListener("input", updateConfirmBtn));
+  ["#cNome", "#cEmail", "#cFone", "#cCpf", "#cCep", "#cCidade", "#cUF", "#cBairro", "#cEnd", "#cNum"].forEach((sel) => $(sel)?.addEventListener("input", updateConfirmBtn));
   $("#confirmBtn")?.addEventListener("click", finalizarPedido);
 }
 
@@ -322,10 +321,8 @@ function renderPaymentMethods() {
 
   let methods = [];
   if (checkoutState.timing === "online") {
-    // REGRA: No site, apenas PIX
     methods = [{ id: "pix", label: "PIX", icon: "🔷", desc: "Aprovação imediata" }];
   } else {
-    // REGRA: Na entrega, tudo disponível
     methods = [
       { id: "pix", label: "PIX", icon: "🔷", desc: "Na entrega" },
       { id: "credito", label: "Crédito", icon: "💳", desc: "Maquininha na entrega" },
@@ -377,28 +374,100 @@ function renderCheckout() {
 }
 
 function updateConfirmBtn() {
-  const ok = checkoutState.timing && checkoutState.method && $("#cNome")?.value.trim() && $("#cEmail")?.value.trim() && $("#cFone")?.value.trim() && $("#cCep")?.value.trim() && $("#cUF")?.value.trim() && $("#cEnd")?.value.trim() && $("#cNum")?.value.trim() && getCartItens().length > 0;
+  const ok = checkoutState.timing && checkoutState.method && $("#cNome")?.value.trim() && $("#cEmail")?.value.trim() && $("#cFone")?.value.trim() && $("#cCpf")?.value.trim() && $("#cCep")?.value.trim() && $("#cUF")?.value.trim() && $("#cEnd")?.value.trim() && $("#cNum")?.value.trim() && getCartItens().length > 0;
   $("#confirmBtn").disabled = !ok;
 }
 
 async function finalizarPedido() {
-  const btn = $("#confirmBtn"); btn.disabled = true; btn.textContent = "Processando...";
+  const btn = $("#confirmBtn"); 
+  btn.disabled = true; 
+  btn.textContent = "Processando...";
+  
   try {
     const payload = {
       itens: getCartItens().map((i) => ({ id: i.id, qty: i.qty })),
-      cliente: { nome: $("#cNome").value.trim(), email: $("#cEmail").value.trim(), telefone: $("#cFone").value.trim(), cpf: $("#cCpf").value.trim(), observacoes: $("#cObs").value.trim() },
-      endereco: { cep: $("#cCep").value.trim(), logradouro: $("#cEnd").value.trim(), numero: $("#cNum").value.trim(), complemento: $("#cComp").value.trim(), bairro: $("#cBairro").value.trim(), cidade: $("#cCidade").value.trim(), estado: $("#cUF").value.trim().toUpperCase() },
+      cliente: { 
+        nome: $("#cNome").value.trim(), 
+        email: $("#cEmail").value.trim(), 
+        telefone: $("#cFone").value.trim(), 
+        cpf: $("#cCpf").value.trim(), 
+        observacoes: $("#cObs").value.trim() 
+      },
+      endereco: { 
+        cep: $("#cCep").value.trim(), 
+        logradouro: $("#cEnd").value.trim(), 
+        numero: $("#cNum").value.trim(), 
+        complemento: $("#cComp").value.trim(), 
+        bairro: $("#cBairro").value.trim(), 
+        cidade: $("#cCidade").value.trim(), 
+        estado: $("#cUF").value.trim().toUpperCase() 
+      },
       pagamento: { metodo: checkoutState.method, quando: checkoutState.timing },
       cupom_codigo: cupomAplicado?.codigo || null,
     };
+    
     const res = await API.criarPedido(payload);
-    CART = []; saveCart();
-    if (res.init_point) location.href = res.init_point;
-    else location.href = `pedido.html?id=${res.pedido_id}`;
+    
+    CART = []; 
+    saveCart();
+
+    if (res.pix) {
+      abrirModalPix(res.pedido_id, res.pix);
+    } else if (res.init_point) {
+      location.href = res.init_point;
+    } else {
+      location.href = `pedido.html?id=${res.pedido_id}`;
+    }
+    
   } catch (err) {
     alert("Erro ao processar: " + err.message);
-    btn.disabled = false; btn.textContent = "Confirmar pedido";
+    btn.disabled = false; 
+    btn.textContent = "Confirmar pedido";
   }
+}
+
+/* ==================== LÓGICA DO PIX ==================== */
+function abrirModalPix(pedidoId, pixData) {
+  pedidoPixIdGlobal = pedidoId;
+  $("#pixQRCode").src = `data:image/jpeg;base64,${pixData.qr_code_base64}`;
+  $("#pixCopiaCola").value = pixData.qr_code;
+  $("#pixStatus").textContent = "Aguardando pagamento...";
+  $("#pixStatus").style.color = "var(--destaque)";
+  
+  $("#pixModal").classList.add("open");
+
+  if (pixCheckInterval) clearInterval(pixCheckInterval);
+  
+  pixCheckInterval = setInterval(async () => {
+    try {
+      const pedido = await API.getPedido(pedidoId);
+      if (pedido.status === 'pago' || pedido.status === 'em_separacao') {
+        clearInterval(pixCheckInterval);
+        $("#pixStatus").textContent = "✅ Pagamento Aprovado! Redirecionando...";
+        $("#pixStatus").style.color = "var(--sucesso)";
+        setTimeout(() => { location.href = `pedido.html?id=${pedidoId}`; }, 2000);
+      }
+    } catch (err) {
+      console.error("Erro ao verificar status:", err);
+    }
+  }, 3000); 
+}
+
+function copiarPix() {
+  const input = $("#pixCopiaCola");
+  input.select();
+  document.execCommand("copy");
+  const btn = event.target;
+  const txt = btn.textContent;
+  btn.textContent = "Copiado!";
+  btn.style.background = "var(--sucesso)";
+  setTimeout(() => { btn.textContent = txt; btn.style.background = "var(--primaria)"; }, 2000);
+}
+
+function fecharModalPix() {
+  if (pixCheckInterval) clearInterval(pixCheckInterval);
+  $("#pixModal").classList.remove("open");
+  if (pedidoPixIdGlobal) location.href = `pedido.html?id=${pedidoPixIdGlobal}`;
 }
 
 /* ==================== INIT ==================== */

@@ -27,7 +27,7 @@
               </div>
               <div class="form-row">
                 <div class="field"><label>WhatsApp *</label><input id="cFone" required placeholder="(00) 00000-0000" inputmode="tel"></div>
-                <div class="field"><label>CPF (opcional)</label><input id="cCpf" placeholder="000.000.000-00" inputmode="numeric"></div>
+                <div class="field"><label>CPF *</label><input id="cCpf" required placeholder="000.000.000-00" inputmode="numeric"></div>
               </div>
               <div class="field"><label>Observações (opcional)</label><textarea id="cObs" rows="2" placeholder="Ponto de referência, horário, etc."></textarea></div>
             </div>
@@ -100,6 +100,30 @@
     <aside class="cart-drawer" id="cartDrawer" aria-hidden="true"></aside>
     <div class="overlay" id="overlay"></div>
     <div class="modal" id="modal" aria-hidden="true"><div class="modal-box" id="modalBox"></div></div>
+
+    <!-- MODAL DO PIX TRANSPARENTE -->
+    <div class="modal" id="pixModal" aria-hidden="true">
+      <div class="modal-box" style="flex-direction: column; max-width: 420px; text-align: center;">
+        <button class="modal-close" onclick="fecharModalPix()">✕</button>
+        <div style="padding: 32px;">
+          <h2 style="margin-bottom: 8px;">Pague com PIX</h2>
+          <p class="muted" style="font-size: 0.9rem; margin-bottom: 20px;">Abra o app do seu banco e escaneie o QR Code abaixo.</p>
+          
+          <img id="pixQRCode" src="" alt="QR Code PIX" style="width: 220px; height: 220px; margin: 0 auto; border: 1px solid var(--borda); border-radius: 8px;">
+          
+          <p class="muted" style="font-size: 0.85rem; margin-top: 20px; margin-bottom: 8px;">Ou copie o código Copia e Cola:</p>
+          
+          <div style="display: flex; gap: 8px;">
+            <input id="pixCopiaCola" type="text" readonly style="flex: 1; padding: 10px; border: 1px solid var(--borda); border-radius: 8px; background: var(--bg-soft); font-size: 0.85rem;">
+            <button class="btn" onclick="copiarPix()" style="padding: 10px 16px;">Copiar</button>
+          </div>
+          
+          <p id="pixStatus" style="margin-top: 24px; font-weight: 700; color: var(--destaque);">
+            Aguardando pagamento...
+          </p>
+        </div>
+      </div>
+    </div>
 
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
