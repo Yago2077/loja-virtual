@@ -94,12 +94,41 @@
             ${historico ? `<h2 style="font-size: 1.2rem; margin-top: 32px; border-bottom: 1px solid var(--borda); padding-bottom: 8px;">Histórico</h2><ul style="margin-top: 12px;">${historico}</ul>` : ""}
 
             <div style="margin-top: 40px; text-align: center;">
-              <a href="produtos.html" class="btn">Continuar comprando</a>
+              <button onclick="mostrarAgradecimento()" class="btn">Continuar comprando</button>
             </div>
-          </div>`;
+          </div>
+
+          <!-- TELA DE AGRADECIMENTO (Escondida inicialmente) -->
+          <div id="telaObrigado" style="display: none; text-align: center; padding: 60px 20px; animation: fadeIn 0.5s ease;">
+            <h1 style="font-size: 2.5rem; color: var(--primaria); margin-bottom: 24px; font-weight: 800;">OBRIGADO PELA PREFERÊNCIA!</h1>
+            <div style="display: flex; justify-content: center;">
+              <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M9 12l2 2 4-4"></path>
+              </svg>
+            </div>
+            <p class="muted" style="margin-top: 24px; font-size: 1.1rem;">Redirecionando para a loja...</p>
+          </div>
+          
+          <style>
+            @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+          </style>`;
         } catch (err) {
           box.innerHTML = `<p class="text-center muted">Não foi possível carregar o pedido. ${err.message}</p>`;
         }
+      }
+
+      function mostrarAgradecimento() {
+        document.querySelector('.checkout-card').style.display = 'none';
+        document.getElementById('telaObrigado').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        setTimeout(() => {
+          window.location.href = 'produtos.html';
+        }, 3000);
       }
 
       APP_READY.then(carregarPedido);

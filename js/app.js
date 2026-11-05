@@ -281,7 +281,7 @@ function abrirModalPix(pedidoId, pixData) {
         setTimeout(() => { location.href = `pedido.html?id=${pedidoId}`; }, 2000);
       }
     } catch (err) { console.error(err); }
-  }, 3000); 
+  }, 1000); 
 }
 
 function copiarPix() {
