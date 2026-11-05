@@ -6,10 +6,7 @@
     <title>Contato · Minha Loja</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body data-page="contato">
@@ -19,72 +16,41 @@
       <section class="page-head">
         <div class="container">
           <h1>Fale conosco</h1>
-          <p class="muted">
-            Respondemos em até 2 horas úteis. Escolha o canal que preferir.
-          </p>
+          <p class="muted">Respondemos em até 2 horas úteis. Escolha o canal que preferir.</p>
         </div>
       </section>
 
-      <section class="section" style="padding-top: 24px">
-        <div class="container contato-grid">
-          <div class="contato-info">
-            <div class="info-card" id="infoWhats">
-              <span class="info-ico">💬</span>
-              <div>
-                <strong>WhatsApp</strong
-                ><small>Atendimento rápido e pedidos</small>
-              </div>
+      <section class="section" style="padding-top: 20px;">
+        <div class="container checkout-grid">
+          
+          <div class="contato-info" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="checkout-card" id="infoWhats" style="cursor: pointer; display: flex; align-items: center; gap: 16px;">
+              <span style="font-size: 2rem;">💬</span>
+              <div><strong>WhatsApp</strong><br><small class="muted">Atendimento rápido e pedidos</small></div>
             </div>
-            <div class="info-card" id="infoEmail">
-              <span class="info-ico">✉️</span>
-              <div>
-                <strong>E-mail</strong><small>Para assuntos mais longos</small>
-              </div>
+            <div class="checkout-card" id="infoEmail" style="cursor: pointer; display: flex; align-items: center; gap: 16px;">
+              <span style="font-size: 2rem;">✉️</span>
+              <div><strong>E-mail</strong><br><small class="muted">Para assuntos mais longos</small></div>
             </div>
-            <div class="info-card" id="infoInsta">
-              <span class="info-ico">📷</span>
-              <div>
-                <strong>Instagram</strong><small>Novidades e bastidores</small>
-              </div>
+            <div class="checkout-card" id="infoInsta" style="cursor: pointer; display: flex; align-items: center; gap: 16px;">
+              <span style="font-size: 2rem;">📷</span>
+              <div><strong>Instagram</strong><br><small class="muted">Novidades e bastidores</small></div>
             </div>
-            <div class="info-card" id="infoEnd">
-              <span class="info-ico">📍</span>
-              <div>
-                <strong>Endereço</strong><small>Visitas com agendamento</small>
-              </div>
+            <div class="checkout-card" id="infoEnd" style="cursor: pointer; display: flex; align-items: center; gap: 16px;">
+              <span style="font-size: 2rem;">📍</span>
+              <div><strong>Endereço</strong><br><small class="muted">Visitas com agendamento</small></div>
             </div>
-            <div class="info-card" id="infoHorario">
-              <span class="info-ico">🕒</span>
-              <div><strong>Horário</strong><small></small></div>
+            <div class="checkout-card" id="infoHorario" style="display: flex; align-items: center; gap: 16px;">
+              <span style="font-size: 2rem;">🕒</span>
+              <div><strong>Horário</strong><br><small class="muted"></small></div>
             </div>
           </div>
 
-          <form class="form-card" id="contatoForm">
+          <form class="checkout-card" id="contatoForm">
             <h2>Envie uma mensagem</h2>
-            <p class="muted" style="margin-bottom: 16px">
-              Preencha os campos e clique em enviar. Vamos te responder pelo
-              WhatsApp ou e-mail.
-            </p>
             <div class="form-row">
-              <div class="field">
-                <label>Nome</label
-                ><input
-                  name="nome"
-                  required
-                  maxlength="80"
-                  placeholder="Como podemos te chamar?"
-                />
-              </div>
-              <div class="field">
-                <label>E-mail</label
-                ><input
-                  name="email"
-                  type="email"
-                  required
-                  maxlength="120"
-                  placeholder="seu@email.com"
-                />
-              </div>
+              <div class="field"><label>Nome</label><input name="nome" required maxlength="80" placeholder="Como podemos te chamar?"></div>
+              <div class="field"><label>E-mail</label><input name="email" type="email" required maxlength="120" placeholder="seu@email.com"></div>
             </div>
             <div class="field">
               <label>Assunto</label>
@@ -97,71 +63,21 @@
               </select>
             </div>
             <div class="field">
-              <label>Mensagem</label
-              ><textarea
-                name="msg"
-                rows="6"
-                required
-                maxlength="1000"
-                placeholder="Escreva sua mensagem..."
-              ></textarea>
+              <label>Mensagem</label>
+              <textarea name="msg" rows="6" required maxlength="1000" placeholder="Escreva sua mensagem..."></textarea>
             </div>
-            <button class="btn" type="submit">Enviar mensagem</button>
+            <button class="btn btn-block" type="submit">Enviar mensagem</button>
           </form>
-        </div>
-      </section>
 
-      <section class="section alt">
-        <div class="container">
-          <h2 style="margin-bottom: 20px">Perguntas frequentes</h2>
-          <div class="faq">
-            <details>
-              <summary>Qual o prazo de entrega?</summary>
-              <p>
-                Enviamos em até 24h úteis após a confirmação do pagamento. O
-                prazo de transporte varia de 2 a 7 dias úteis, dependendo da sua
-                região.
-              </p>
-            </details>
-            <details>
-              <summary>Posso pagar na entrega?</summary>
-              <p>
-                Sim! Aceitamos dinheiro, cartão (débito/crédito) e PIX na
-                entrega. Basta selecionar essa opção no checkout.
-              </p>
-            </details>
-            <details>
-              <summary>Como funciona o PIX?</summary>
-              <p>
-                Ao escolher PIX no checkout, você é redirecionado para o
-                ambiente seguro do Mercado Pago para pagar.
-              </p>
-            </details>
-            <details>
-              <summary>Vocês emitem nota fiscal?</summary>
-              <p>
-                Sim, todos os pedidos são acompanhados de nota fiscal eletrônica
-                enviada por e-mail.
-              </p>
-            </details>
-            <details>
-              <summary>Posso trocar um produto?</summary>
-              <p>
-                Sim. Você tem 7 dias corridos após o recebimento para solicitar
-                troca ou devolução.
-              </p>
-            </details>
-          </div>
         </div>
       </section>
     </main>
 
     <footer id="app-footer"></footer>
-    <aside class="cart-drawer" id="cartDrawer" aria-hidden="true"></aside>
+    
+    <aside class="cart-drawer" id="cartDrawer"></aside>
     <div class="overlay" id="overlay"></div>
-    <div class="modal" id="modal" aria-hidden="true">
-      <div class="modal-box" id="modalBox"></div>
-    </div>
+    <div class="modal" id="modal"><div class="modal-box" id="modalBox"></div></div>
 
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>

@@ -67,18 +67,7 @@
 
             <div class="checkout-card" id="methodSection" style="display:none">
               <h2>5. Forma de pagamento</h2>
-              <div class="pay-grid" id="methodContainer">
-                <!-- Preenchido via JavaScript -->
-              </div>
-            </div>
-
-            <div class="checkout-card">
-              <h2>6. Cupom de desconto</h2>
-              <div style="display: flex; gap: 12px">
-                <input id="cupomInput" placeholder="Digite o código" style="flex: 1; padding: 14px 16px; border: 1px solid var(--borda); border-radius: 12px; background: var(--bg-soft);">
-                <button type="button" class="btn btn-ghost" id="cupomBtn">Aplicar</button>
-              </div>
-              <small id="cupomMsg" class="muted" style="display: block; margin-top: 12px;"></small>
+              <div class="pay-grid" id="methodContainer"></div>
             </div>
           </div>
 
@@ -90,37 +79,32 @@
             <div class="summary-row"><span>Frete</span><span>Grátis</span></div>
             <div class="summary-total"><span>Total</span><strong id="summaryTotal">R$ 0,00</strong></div>
             <button class="btn btn-block" id="confirmBtn" disabled>Confirmar pedido</button>
-            <p class="muted small" style="text-align: center; margin-top: 16px;">Ambiente 100% seguro.</p>
+            <p class="muted small text-center" style="margin-top: 16px;">Ambiente 100% seguro.</p>
           </aside>
         </div>
       </section>
     </main>
 
     <footer id="app-footer"></footer>
-    <aside class="cart-drawer" id="cartDrawer" aria-hidden="true"></aside>
+    
+    <aside class="cart-drawer" id="cartDrawer"></aside>
     <div class="overlay" id="overlay"></div>
-    <div class="modal" id="modal" aria-hidden="true"><div class="modal-box" id="modalBox"></div></div>
+    <div class="modal" id="modal"><div class="modal-box" id="modalBox"></div></div>
 
     <!-- MODAL DO PIX TRANSPARENTE -->
-    <div class="modal" id="pixModal" aria-hidden="true">
-      <div class="modal-box" style="flex-direction: column; max-width: 420px; text-align: center;">
+    <div class="modal" id="pixModal">
+      <div class="modal-box pix-modal-box">
         <button class="modal-close" onclick="fecharModalPix()">✕</button>
-        <div style="padding: 32px;">
-          <h2 style="margin-bottom: 8px;">Pague com PIX</h2>
-          <p class="muted" style="font-size: 0.9rem; margin-bottom: 20px;">Abra o app do seu banco e escaneie o QR Code abaixo.</p>
-          
-          <img id="pixQRCode" src="" alt="QR Code PIX" style="width: 220px; height: 220px; margin: 0 auto; border: 1px solid var(--borda); border-radius: 8px;">
-          
-          <p class="muted" style="font-size: 0.85rem; margin-top: 20px; margin-bottom: 8px;">Ou copie o código Copia e Cola:</p>
-          
-          <div style="display: flex; gap: 8px;">
-            <input id="pixCopiaCola" type="text" readonly style="flex: 1; padding: 10px; border: 1px solid var(--borda); border-radius: 8px; background: var(--bg-soft); font-size: 0.85rem;">
-            <button class="btn" onclick="copiarPix()" style="padding: 10px 16px;">Copiar</button>
+        <div class="pix-content">
+          <h2>Pague com PIX</h2>
+          <p class="muted" style="font-size: 0.9rem;">Abra o app do seu banco e escaneie o QR Code.</p>
+          <img id="pixQRCode" src="" alt="QR Code PIX" class="pix-qr-img">
+          <p class="muted small">Ou copie o código Copia e Cola:</p>
+          <div class="pix-copia-cola-wrap">
+            <input id="pixCopiaCola" type="text" readonly>
+            <button class="btn" onclick="copiarPix()">Copiar</button>
           </div>
-          
-          <p id="pixStatus" style="margin-top: 24px; font-weight: 700; color: var(--destaque);">
-            Aguardando pagamento...
-          </p>
+          <p id="pixStatus" class="pix-status">Aguardando pagamento...</p>
         </div>
       </div>
     </div>

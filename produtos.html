@@ -6,10 +6,7 @@
     <title>Produtos · Minha Loja</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body data-page="produtos">
@@ -23,30 +20,26 @@
         </div>
       </section>
 
-      <section class="section" style="padding-top: 24px">
+      <section class="section" style="padding-top: 0;">
         <div class="container">
-          <div class="filters">
-            <div class="search-wrap">
-              <span class="search-ico">🔍</span>
-              <input type="search" id="busca" placeholder="Buscar produto..." />
-            </div>
-            <select id="categoria">
+          <div class="filters" style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+            <input type="search" id="busca" placeholder="🔍 Buscar produto..." style="flex: 1; min-width: 250px; padding: 14px 16px; border: 1px solid var(--borda); border-radius: 8px; font-size: 1rem;">
+            <select id="categoria" style="padding: 14px 16px; border: 1px solid var(--borda); border-radius: 8px; font-size: 1rem; min-width: 200px; cursor: pointer;">
               <option value="">Todas as categorias</option>
             </select>
           </div>
-          <p class="muted" id="contador" style="margin-bottom: 16px"></p>
+          
           <div class="grid" id="produtosGrid"></div>
-          <p id="vazio" class="vazio" hidden>Nenhum produto encontrado.</p>
+          <p id="vazio" class="text-center muted" style="margin-top: 40px;" hidden>Nenhum produto encontrado.</p>
         </div>
       </section>
     </main>
 
     <footer id="app-footer"></footer>
-    <aside class="cart-drawer" id="cartDrawer" aria-hidden="true"></aside>
+    
+    <aside class="cart-drawer" id="cartDrawer"></aside>
     <div class="overlay" id="overlay"></div>
-    <div class="modal" id="modal" aria-hidden="true">
-      <div class="modal-box" id="modalBox"></div>
-    </div>
+    <div class="modal" id="modal"><div class="modal-box" id="modalBox"></div></div>
 
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>

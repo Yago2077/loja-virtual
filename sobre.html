@@ -6,10 +6,7 @@
     <title>Sobre · Minha Loja</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body data-page="sobre">
@@ -19,63 +16,39 @@
       <section class="page-head">
         <div class="container">
           <h1>Nossa história</h1>
-          <p class="muted">
-            Uma loja feita por gente que se importa com o que vende.
-          </p>
+          <p class="muted">Uma loja feita por gente que se importa com o que vende.</p>
         </div>
       </section>
 
-      <section class="section">
-        <div class="container sobre-grid">
+      <section class="section" style="padding-top: 20px;">
+        <div class="container checkout-grid">
           <div class="sobre-text">
             <h2>Como começou</h2>
-            <p>
-              Nascemos em 2020, em uma pequena sala de casa, com a ideia simples
-              de oferecer produtos que a gente mesmo usaria. Sempre acreditamos
-              que comprar online pode ser uma experiência humana — com uma
-              pessoa real do outro lado respondendo suas dúvidas.
-            </p>
-            <p>
-              Hoje atendemos todo o Brasil, mas mantemos o mesmo cuidado
-              artesanal: cada pedido é conferido, embalado e despachado por
-              nossa equipe, com carinho.
-            </p>
+            <p style="margin-bottom: 16px;">Nascemos em 2020, em uma pequena sala de casa, com a ideia simples de oferecer produtos que a gente mesmo usaria. Sempre acreditamos que comprar online pode ser uma experiência humana — com uma pessoa real do outro lado respondendo suas dúvidas.</p>
+            <p style="margin-bottom: 32px;">Hoje atendemos todo o Brasil, mas mantemos o mesmo cuidado artesanal: cada pedido é conferido, embalado e despachado por nossa equipe, com carinho.</p>
 
             <h2>Nossos valores</h2>
-            <div class="values">
-              <div class="value">
-                <strong>🤝 Transparência</strong>
-                <p>
-                  Preço justo, sem pegadinhas. O que você vê é o que você paga.
-                </p>
-              </div>
-              <div class="value">
-                <strong>💎 Qualidade</strong>
-                <p>Só vendemos o que aprovaríamos para nós mesmos.</p>
-              </div>
-              <div class="value">
-                <strong>⚡ Agilidade</strong>
-                <p>Resposta em até 2h úteis. Envio em 24h após confirmação.</p>
-              </div>
-              <div class="value">
-                <strong>♻️ Responsabilidade</strong>
-                <p>Embalagens recicláveis e logística consciente.</p>
-              </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+              <div class="checkout-card" style="margin-bottom: 0;"><strong>🤝 Transparência</strong><p class="muted small" style="margin-top: 8px;">Preço justo, sem pegadinhas. O que você vê é o que você paga.</p></div>
+              <div class="checkout-card" style="margin-bottom: 0;"><strong>💎 Qualidade</strong><p class="muted small" style="margin-top: 8px;">Só vendemos o que aprovaríamos para nós mesmos.</p></div>
+              <div class="checkout-card" style="margin-bottom: 0;"><strong>⚡ Agilidade</strong><p class="muted small" style="margin-top: 8px;">Resposta em até 2h úteis. Envio em 24h após confirmação.</p></div>
+              <div class="checkout-card" style="margin-bottom: 0;"><strong>♻️ Responsabilidade</strong><p class="muted small" style="margin-top: 8px;">Embalagens recicláveis e logística consciente.</p></div>
             </div>
           </div>
-          <aside class="sobre-aside">
-            <div class="aside-card">
+
+          <aside>
+            <div class="checkout-card">
               <h3>Nossos números</h3>
-              <ul class="stats-list">
-                <li><strong>+2.500</strong><span>pedidos entregues</span></li>
-                <li><strong>4.9★</strong><span>avaliação média</span></li>
-                <li><strong>98%</strong><span>clientes satisfeitos</span></li>
-                <li><strong>24h</strong><span>envio médio</span></li>
+              <ul style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+                <li style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--borda); padding-bottom: 8px;"><strong>+2.500</strong><span class="muted">pedidos entregues</span></li>
+                <li style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--borda); padding-bottom: 8px;"><strong>4.9★</strong><span class="muted">avaliação média</span></li>
+                <li style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--borda); padding-bottom: 8px;"><strong>98%</strong><span class="muted">clientes satisfeitos</span></li>
+                <li style="display: flex; justify-content: space-between;"><strong>24h</strong><span class="muted">envio médio</span></li>
               </ul>
             </div>
-            <div class="aside-card">
+            <div class="checkout-card">
               <h3>Precisa falar?</h3>
-              <p class="muted">Estamos por aqui para o que precisar.</p>
+              <p class="muted small" style="margin: 8px 0 16px;">Estamos por aqui para o que precisar.</p>
               <a href="contato.html" class="btn btn-block">Fale conosco</a>
             </div>
           </aside>
@@ -84,11 +57,10 @@
     </main>
 
     <footer id="app-footer"></footer>
-    <aside class="cart-drawer" id="cartDrawer" aria-hidden="true"></aside>
+    
+    <aside class="cart-drawer" id="cartDrawer"></aside>
     <div class="overlay" id="overlay"></div>
-    <div class="modal" id="modal" aria-hidden="true">
-      <div class="modal-box" id="modalBox"></div>
-    </div>
+    <div class="modal" id="modal"><div class="modal-box" id="modalBox"></div></div>
 
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
