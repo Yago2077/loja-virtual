@@ -4,53 +4,39 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contato · Minha Loja</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body data-page="contato">
     <header id="app-header"></header>
 
-    <main>
-      <section class="page-head">
-        <div class="container">
-          <h1>Fale conosco</h1>
-          <p class="muted">Respondemos em até 2 horas úteis. Escolha o canal que preferir.</p>
-        </div>
-      </section>
+    <main class="section">
+      <div class="container" style="max-width: 800px">
+        <h1 class="text-center" style="margin-bottom: 32px">Fale conosco</h1>
 
-      <section class="section" style="padding-top: 20px;">
-        <div class="container checkout-grid">
-          
-          <div class="contato-info" style="display: flex; flex-direction: column; gap: 16px;">
-            <div class="checkout-card" id="infoWhats" style="cursor: pointer; display: flex; align-items: center; gap: 16px;">
-              <span style="font-size: 2rem;">💬</span>
-              <div><strong>WhatsApp</strong><br><small class="muted">Atendimento rápido e pedidos</small></div>
-            </div>
-            <div class="checkout-card" id="infoEmail" style="cursor: pointer; display: flex; align-items: center; gap: 16px;">
-              <span style="font-size: 2rem;">✉️</span>
-              <div><strong>E-mail</strong><br><small class="muted">Para assuntos mais longos</small></div>
-            </div>
-            <div class="checkout-card" id="infoInsta" style="cursor: pointer; display: flex; align-items: center; gap: 16px;">
-              <span style="font-size: 2rem;">📷</span>
-              <div><strong>Instagram</strong><br><small class="muted">Novidades e bastidores</small></div>
-            </div>
-            <div class="checkout-card" id="infoEnd" style="cursor: pointer; display: flex; align-items: center; gap: 16px;">
-              <span style="font-size: 2rem;">📍</span>
-              <div><strong>Endereço</strong><br><small class="muted">Visitas com agendamento</small></div>
-            </div>
-            <div class="checkout-card" id="infoHorario" style="display: flex; align-items: center; gap: 16px;">
-              <span style="font-size: 2rem;">🕒</span>
-              <div><strong>Horário</strong><br><small class="muted"></small></div>
-            </div>
-          </div>
-
-          <form class="checkout-card" id="contatoForm">
-            <h2>Envie uma mensagem</h2>
+        <div class="checkout-card">
+          <form id="contatoForm">
             <div class="form-row">
-              <div class="field"><label>Nome</label><input name="nome" required maxlength="80" placeholder="Como podemos te chamar?"></div>
-              <div class="field"><label>E-mail</label><input name="email" type="email" required maxlength="120" placeholder="seu@email.com"></div>
+              <div class="field">
+                <label>Seu Nome</label
+                ><input
+                  name="nome"
+                  required
+                  placeholder="Como podemos te chamar?"
+                />
+              </div>
+              <div class="field">
+                <label>Seu E-mail</label
+                ><input
+                  name="email"
+                  type="email"
+                  required
+                  placeholder="seu@email.com"
+                />
+              </div>
             </div>
             <div class="field">
               <label>Assunto</label>
@@ -58,26 +44,31 @@
                 <option>Dúvida sobre produto</option>
                 <option>Status do meu pedido</option>
                 <option>Troca ou devolução</option>
-                <option>Parceria / revenda</option>
                 <option>Outro</option>
               </select>
             </div>
             <div class="field">
               <label>Mensagem</label>
-              <textarea name="msg" rows="6" required maxlength="1000" placeholder="Escreva sua mensagem..."></textarea>
+              <!-- O resize: none já está aplicado no CSS global -->
+              <textarea
+                name="msg"
+                rows="6"
+                required
+                placeholder="Escreva detalhadamente..."
+              ></textarea>
             </div>
             <button class="btn btn-block" type="submit">Enviar mensagem</button>
           </form>
-
         </div>
-      </section>
+      </div>
     </main>
 
     <footer id="app-footer"></footer>
-    
     <aside class="cart-drawer" id="cartDrawer"></aside>
     <div class="overlay" id="overlay"></div>
-    <div class="modal" id="modal"><div class="modal-box" id="modalBox"></div></div>
+    <div class="modal" id="modal">
+      <div class="modal-box" id="modalBox"></div>
+    </div>
 
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>

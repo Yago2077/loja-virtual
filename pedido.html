@@ -3,9 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Meu pedido · Minha Loja</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <title>Pedido · Minha Loja</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body data-page="pedido">
@@ -14,7 +16,7 @@
     <main class="section">
       <div class="container">
         <div id="pedidoContainer">
-          <p class="muted text-center" style="padding: 60px 0;">Carregando pedido...</p>
+          <p class="text-center muted">Carregando...</p>
         </div>
       </div>
     </main>
@@ -27,110 +29,88 @@
       async function carregarPedido() {
         const id = new URLSearchParams(location.search).get("id");
         const box = document.getElementById("pedidoContainer");
-
         if (!id) {
-          box.innerHTML = '<p class="text-center muted">Pedido não especificado.</p>';
+          box.innerHTML = '<p class="text-center">Pedido inválido.</p>';
           return;
         }
 
         try {
           const p = await API.getPedido(id);
 
-          const statusMap = {
-            pendente_pagamento: ["Pendente de pagamento", "status-pendente"],
-            pago: ["Pago", "status-pago"],
-            em_separacao: ["Em separação", "status-outro"],
-            enviado: ["Enviado", "status-outro"],
-            entregue: ["Entregue", "status-pago"],
-            cancelado: ["Cancelado", "status-cancelado"],
-            reembolsado: ["Reembolsado", "status-cancelado"],
-          };
-          const [label, cls] = statusMap[p.status] || [p.status, "status-outro"];
+          const itensHtml = p.order_items
+            .map(
+              (i) => `
+            <div class="recibo-item">
+              <span><strong>${i.quantidade}x</strong> ${i.produto_nome}</span>
+              <span>${money(i.subtotal)}</span>
+            </div>`,
+            )
+            .join("");
 
-          const itensHtml = p.order_items.map((i) => `
-            <li style="padding: 12px 0; border-bottom: 1px solid var(--borda); display: flex; justify-content: space-between;">
-              <span>${i.quantidade}× ${i.produto_nome}</span>
-              <strong>${money(i.subtotal)}</strong>
-            </li>`).join("");
-
-          const historico = (p.order_status_history || [])
+          const historicoHtml = (p.order_status_history || [])
             .sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em))
-            .map((h) => `
-              <li style="padding: 12px 0 12px 28px; border-left: 2px solid var(--borda); position: relative;">
-                <div style="position: absolute; left: -7px; top: 18px; width: 12px; height: 12px; border-radius: 50%; background: var(--primaria);"></div>
-                <strong>${h.status}</strong> · ${new Date(h.criado_em).toLocaleString("pt-BR")}
-                ${h.observacao ? `<br><small class="muted">${h.observacao}</small>` : ""}
-              </li>`).join("");
+            .map(
+              (h) =>
+                `<li><strong>${h.status.toUpperCase()}</strong> <br><small class="muted">${new Date(h.criado_em).toLocaleString("pt-BR")}</small></li>`,
+            )
+            .join("");
 
           box.innerHTML = `
-          <div class="checkout-card" style="max-width: 800px; margin: 0 auto;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
+          <div class="recibo-box" id="reciboBox">
+            <div class="recibo-header">
               <div>
-                <h1 style="margin: 0 0 6px; font-size: 1.8rem;">Pedido #${p.numero || p.id.substring(0,6)}</h1>
+                <h1>✅ SEU PEDIDO #${p.id.substring(0, 6).toUpperCase()}</h1>
                 <p class="muted">${new Date(p.criado_em).toLocaleString("pt-BR")}</p>
               </div>
-              <span class="tag" style="position: static; background: ${p.status === 'pago' ? 'var(--sucesso)' : 'var(--destaque)'};">${label}</span>
+              <span style="background:var(--primaria-soft); color:var(--primaria); padding:6px 16px; border-radius:20px; font-weight:700; font-size:0.85rem;">${p.status.toUpperCase()}</span>
             </div>
 
-            <p><strong>Pagamento:</strong> ${p.payment_method.toUpperCase()} (${p.payment_timing === "online" ? "pelo site" : "na entrega"})</p>
+            <h3 style="margin-bottom:12px;">Itens</h3>
+            ${itensHtml}
 
-            <h2 style="font-size: 1.2rem; margin-top: 32px; border-bottom: 1px solid var(--borda); padding-bottom: 8px;">Itens</h2>
-            <ul>${itensHtml}</ul>
+            <h3 style="margin-top:32px; margin-bottom:12px;">Valor</h3>
+            <div class="recibo-item"><span>Subtotal</span><span>${money(p.subtotal)}</span></div>
+            ${p.desconto > 0 ? `<div class="recibo-item" style="color:var(--sucesso)"><span>Desconto</span><span>- ${money(p.desconto)}</span></div>` : ""}
+            <div class="recibo-total"><span>Total do Pedido</span><span>${money(p.total)}</span></div>
 
-            <div style="margin-top: 24px; padding-top: 16px; border-top: 2px solid var(--borda);">
-              <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span>Subtotal</span><span>${money(p.subtotal)}</span></div>
-              ${Number(p.desconto) > 0 ? `<div style="display: flex; justify-content: space-between; padding: 8px 0; color: var(--sucesso);"><span>Desconto</span><span>- ${money(p.desconto)}</span></div>` : ""}
-              <div style="display: flex; justify-content: space-between; padding: 8px 0;"><span>Frete</span><span>${Number(p.frete) > 0 ? money(p.frete) : "Grátis"}</span></div>
-              <div style="display: flex; justify-content: space-between; padding: 16px 0 0; font-size: 1.2rem; font-weight: 800; color: var(--primaria);"><span>Total</span><span>${money(p.total)}</span></div>
-            </div>
+            <h3 style="margin-top:32px; margin-bottom:12px;">Forma de Pagamento</h3>
+            <p class="muted">❖ Pgt. ${p.payment_timing === "online" ? "Online" : "na entrega"} (${p.payment_method.toUpperCase()})</p>
+            <p class="muted">↳ VALOR: ${money(p.total)}</p>
+            ${p.payment_gateway_id ? `<p class="muted" style="word-break:break-all;">↳ COD. PAGAMENTO: ${p.payment_gateway_id}</p>` : ""}
 
-            <h2 style="font-size: 1.2rem; margin-top: 32px; border-bottom: 1px solid var(--borda); padding-bottom: 8px;">Endereço de entrega</h2>
-            <p class="muted" style="margin-top: 12px; line-height: 1.6;">
-              ${p.endereco_logradouro}, ${p.endereco_numero}${p.endereco_complemento ? " — " + p.endereco_complemento : ""}<br>
-              ${p.endereco_bairro} · ${p.endereco_cidade}/${p.endereco_estado}<br>
-              CEP ${p.endereco_cep}
-            </p>
+            <h3 style="margin-top:32px; margin-bottom:12px;">Entrega</h3>
+            <p class="muted">${p.endereco_logradouro}, ${p.endereco_numero}${p.endereco_complemento ? ", " + p.endereco_complemento : ""}, ${p.endereco_bairro}, ${p.endereco_cidade} - ${p.endereco_estado}</p>
+            <p class="muted" style="margin-top:8px;"><strong>Previsão:</strong> Em até 3 dias úteis</p>
 
-            ${historico ? `<h2 style="font-size: 1.2rem; margin-top: 32px; border-bottom: 1px solid var(--borda); padding-bottom: 8px;">Histórico</h2><ul style="margin-top: 12px;">${historico}</ul>` : ""}
-
-            <div style="margin-top: 40px; text-align: center;">
+            <div style="margin-top:40px; text-align:center;">
               <button onclick="mostrarAgradecimento()" class="btn">Continuar comprando</button>
             </div>
           </div>
 
-          <!-- TELA DE AGRADECIMENTO (Escondida inicialmente) -->
-          <div id="telaObrigado" style="display: none; text-align: center; padding: 60px 20px; animation: fadeIn 0.5s ease;">
-            <h1 style="font-size: 2.5rem; color: var(--primaria); margin-bottom: 24px; font-weight: 800;">OBRIGADO PELA PREFERÊNCIA!</h1>
-            <div style="display: flex; justify-content: center;">
-              <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M9 12l2 2 4-4"></path>
+          <!-- TELA DE OBRIGADO -->
+          <div id="telaObrigado" style="display:none; text-align:center; padding:60px 20px; animation: fadeIn 0.5s ease;">
+            <h1 style="font-size:2.5rem; color:var(--primaria); margin-bottom:24px; font-weight:800;">OBRIGADO PELA PREFERÊNCIA!</h1>
+            <div style="display:flex; justify-content:center;">
+              <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="var(--sucesso)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path>
               </svg>
             </div>
-            <p class="muted" style="margin-top: 24px; font-size: 1.1rem;">Redirecionando para a loja...</p>
+            <p class="muted" style="margin-top:24px;">Redirecionando...</p>
           </div>
-          
-          <style>
-            @keyframes fadeIn {
-              from { opacity: 0; transform: translateY(10px); }
-              to { opacity: 1; transform: translateY(0); }
-            }
-          </style>`;
+          `;
         } catch (err) {
-          box.innerHTML = `<p class="text-center muted">Não foi possível carregar o pedido. ${err.message}</p>`;
+          box.innerHTML = `<p class="text-center muted">Pedido não encontrado.</p>`;
         }
       }
 
       function mostrarAgradecimento() {
-        document.querySelector('.checkout-card').style.display = 'none';
-        document.getElementById('telaObrigado').style.display = 'block';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
+        document.getElementById("reciboBox").style.display = "none";
+        document.getElementById("telaObrigado").style.display = "block";
+        window.scrollTo({ top: 0, behavior: "smooth" });
         setTimeout(() => {
-          window.location.href = 'produtos.html';
+          window.location.href = "produtos.html";
         }, 3000);
       }
-
       APP_READY.then(carregarPedido);
     </script>
   </body>
