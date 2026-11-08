@@ -9,6 +9,7 @@
   </head>
   <body data-page="checkout">
     <header id="app-header"></header>
+
     <main class="section" style="padding-top: 40px;">
       <div class="container checkout-grid">
         <div>
@@ -16,6 +17,7 @@
             <h2>1. Seus itens</h2>
             <div id="checkoutItems"></div>
           </div>
+
           <div class="checkout-card">
             <h2>2. Dados Pessoais</h2>
             <div class="form-row">
@@ -27,6 +29,7 @@
               <div class="field"><label>WhatsApp *</label><input id="cFone" placeholder="(19) 99999-9999"></div>
             </div>
           </div>
+
           <div class="checkout-card">
             <h2>3. Endereço de Entrega</h2>
             <div class="form-row">
@@ -43,41 +46,40 @@
             </div>
             <div class="field"><label>Complemento</label><input id="cComp" placeholder="Apto, bloco..."></div>
           </div>
+
           <div class="checkout-card">
-            <h2>4. Pagamento</h2>
-            <div class="pay-grid" style="margin-bottom: 20px;">
-              <label class="pay-opt"><input type="radio" name="payTiming" value="online"><div><strong>Pagar Agora</strong><br><small class="muted">Via PIX</small></div></label>
-              <label class="pay-opt"><input type="radio" name="payTiming" value="entrega"><div><strong>Na Entrega</strong><br><small class="muted">PIX, Cartão, Dinheiro</small></div></label>
-            </div>
-            <div id="methodSection" style="display: none;">
-              <div id="methodContainer" class="pay-grid"></div>
-            </div>
+            <h2>4. Como deseja pagar?</h2>
+            <div class="pay-grid" id="methodContainer"></div>
           </div>
         </div>
+
         <aside>
           <div class="checkout-summary">
             <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Resumo do Pedido</h2>
             <div id="summaryItems"></div>
-            <div class="summary-row"><span>Subtotal</span><span id="subTotal">R$ 0,00</span></div>
+            <div class="summary-row"><span>Frete</span><span style="color: var(--sucesso); font-weight: 600;">Grátis</span></div>
             <div class="summary-total"><span>Total</span><span id="summaryTotal">R$ 0,00</span></div>
             <button class="btn btn-block" id="confirmBtn" style="margin-top: 16px;" disabled>Confirmar Pedido</button>
+            <p class="muted small text-center" style="margin-top: 16px;">🔒 Ambiente 100% Seguro</p>
           </div>
         </aside>
       </div>
     </main>
+
     <footer id="app-footer"></footer>
     <aside class="cart-drawer" id="cartDrawer"></aside>
     <div class="overlay" id="overlay"></div>
     <div class="modal" id="modal"><div class="modal-box" id="modalBox"></div></div>
+    
     <div class="modal" id="pixModal">
       <div class="modal-box" style="max-width: 440px; text-align: center;">
         <button class="modal-close" onclick="fecharModalPix()">✕</button>
         <div style="padding: 32px;">
           <h2 style="margin-bottom: 8px;">Pague com PIX</h2>
-          <p class="muted">Escaneie o código abaixo.</p>
-          <img id="pixQRCode" src="" class="pix-qr-img" alt="QR Code PIX">
-          <div class="pix-copia-cola-wrap">
-            <input id="pixCopiaCola" type="text" readonly>
+          <p class="muted" style="margin-bottom: 20px;">Escaneie o código abaixo.</p>
+          <img id="pixQRCode" src="" style="width: 200px; height: 200px; margin: 0 auto; border: 2px solid var(--borda); border-radius: 12px; padding: 8px; background: #fff;">
+          <div style="display: flex; gap: 8px; margin-top: 20px;">
+            <input id="pixCopiaCola" type="text" readonly style="flex: 1; padding: 12px; border: 1px solid var(--borda); border-radius: 8px; background: var(--bg-soft); font-size: 0.85rem;">
             <button class="btn" onclick="copiarPix()">Copiar</button>
           </div>
           <p id="pixStatus" style="margin-top: 24px; font-weight: 700; color: var(--destaque);">Aguardando pagamento...</p>
