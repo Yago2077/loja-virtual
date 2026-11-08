@@ -3,9 +3,11 @@ const $$ = (s) => document.querySelectorAll(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const money = (n) => (isNaN(n) ? 0 : n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const CART_KEY = "loja_cart_v6";
+const CART_KEY = "loja_cart_v7";
 const PAGE = document.body.dataset.page || "home";
 let CONFIG = {}, PRODUTOS = [], CART = [];
+let descontoAplicado = 0; // Guarda o valor do desconto do cupom
+let pixIntervalCheck = null, pixIntervalTimer = null;
 
 // Ícones SVG
 const ICONS = {
@@ -18,7 +20,6 @@ const ICONS = {
   cash: `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>`
 };
 
-/* ==================== TOAST ==================== */
 function showToast(msg, type = "success") {
   let container = $("#toast-container");
   if (!container) {
@@ -90,7 +91,7 @@ function addCarrinho(id, qty = 1) {
   saveCart(); renderCartDrawer(); renderCartBadge(); 
   fecharModal();
   setTimeout(() => abrirCarrinho(), 300);
-  showToast("Item adicionado!");
+  // Notificação de item adicionado REMOVIDA conforme solicitado
 }
 
 function alterarQtd(id, delta) {
@@ -100,7 +101,7 @@ function alterarQtd(id, delta) {
   if (item.qty > (parseInt(p?.estoque) || 999)) item.qty = parseInt(p.estoque);
   if (item.qty < 1) CART = CART.filter((i) => i.id !== id);
   saveCart(); renderCartDrawer(); renderCartBadge();
-  if (PAGE === "checkout") renderCheckout();
+  if (PAGE === "checkout") renderCheckout(); // Atualiza a tela de checkout se estiver nela
 }
 
 /* ==================== HEADER / FOOTER ==================== */
@@ -152,11 +153,11 @@ function renderCartDrawer() {
       ${itens.length ? itens.map((i) => `
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--borda); padding-bottom:16px;">
           <div><strong>${esc(i.nome)}</strong><br><small class="muted">${money(i.preco)} x ${i.qty}</small></div>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <button onclick="alterarQtd('${i.id}', -1)" class="btn-ghost" style="padding:4px 8px; border-radius:6px;">−</button>
+          <div class="qty-checkout">
+            <button onclick="alterarQtd('${i.id}', -1)">−</button>
             <span>${i.qty}</span>
-            <button onclick="alterarQtd('${i.id}', 1)" class="btn-ghost" style="padding:4px 8px; border-radius:6px;">+</button>
-            <button onclick="alterarQtd('${i.id}', -999)" class="del-btn">${ICONS.trash}</button>
+            <button onclick="alterarQtd('${i.id}', 1)">+</button>
+            <button onclick="alterarQtd('${i.id}', -999)" class="del-btn" style="padding:4px; margin-left:4px;">${ICONS.trash}</button>
           </div>
         </div>`).join("") : '<p class="muted text-center">Seu carrinho está vazio.</p>'}
     </div>
@@ -198,13 +199,13 @@ function abrirProdutoModal(id) {
       <p class="muted">${esc(p.descricao)}</p>
       <p style="font-size:1.8rem; font-weight:800; color:var(--primaria);">${money(p.preco)}</p>
       ${!esgotado ? `
-      <div class="modal-actions">
-        <div class="qty-selector">
+      <div style="display: flex; gap: 16px; margin-top: 16px;">
+        <div class="qty-checkout" style="padding: 8px;">
           <button onclick="document.getElementById('mQty').value = Math.max(1, parseInt(document.getElementById('mQty').value) - 1)">−</button>
-          <input type="number" id="mQty" value="1" min="1" readonly>
+          <input type="number" id="mQty" value="1" min="1" readonly style="width:40px; text-align:center; border:none; background:transparent; color:var(--texto); pointer-events:none; font-weight:bold;">
           <button onclick="document.getElementById('mQty').value = Math.min(${p.estoque}, parseInt(document.getElementById('mQty').value) + 1)">+</button>
         </div>
-        <button class="btn" onclick="addCarrinho('${p.id}', parseInt(document.getElementById('mQty').value))">Adicionar</button>
+        <button class="btn" style="flex:1;" onclick="addCarrinho('${p.id}', parseInt(document.getElementById('mQty').value))">Adicionar</button>
       </div>
       ` : `<p style="color:var(--perigo); font-weight:700; margin-top:16px;">Indisponível</p>`}
     </div>`;
@@ -212,14 +213,11 @@ function abrirProdutoModal(id) {
 }
 function fecharModal() { $("#modal")?.classList.remove("open"); }
 
-// Busca e Filtro
 function initProdutos() {
   const grid = $("#productsGrid"), search = $("#searchInput"), catSelect = $("#categorySelect"), noProducts = $("#noProducts");
   if (!grid) return;
-
   const cats = [...new Set(PRODUTOS.map(p => p.categoria).filter(Boolean))].sort();
   catSelect.innerHTML = `<option value="">Todas as categorias</option>` + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
-
   const renderFilter = () => {
     const termo = search.value.toLowerCase().trim();
     const cat = catSelect.value;
@@ -234,12 +232,11 @@ function initProdutos() {
 
 /* ==================== CHECKOUT ==================== */
 let checkoutState = { metodo: null, quando: null };
-let pedidoPixIdGlobal = null, pixCheckInterval = null;
+let pedidoPixIdGlobal = null;
 
 function initCheckout() {
   const container = $("#methodContainer");
-  if (!container) return; // Correção do bug: garante que o container existe
-  
+  if (!container) return;
   renderCheckout();
   
   const methods = [
@@ -253,7 +250,8 @@ function initCheckout() {
   container.innerHTML = methods.map(m => `
     <label class="pay-opt">
       <input type="radio" name="payMethod" value="${m.value}">
-      <div><strong>${m.icon} ${m.label}</strong><br><small class="muted">${m.desc}</small></div>
+      <div class="pay-icon">${m.icon}</div>
+      <div class="pay-info"><strong>${m.label}</strong><small>${m.desc}</small></div>
     </label>
   `).join("");
 
@@ -274,17 +272,53 @@ function renderCheckout() {
     return;
   }
   
+  // Quantidade alterável no checkout
   $("#checkoutItems").innerHTML = itens.map(i => `
     <div class="co-item">
       <div class="co-item-img">${i.imagem ? `<img src="${esc(i.imagem)}">` : ""}</div>
-      <div style="flex:1;"><strong>${esc(i.nome)}</strong><br><small class="muted">${money(i.preco)} x ${i.qty}</small></div>
-      <strong style="margin-right:16px;">${money(i.preco * i.qty)}</strong>
+      <div style="flex:1;"><strong>${esc(i.nome)}</strong><br><small class="muted">${money(i.preco)}</small></div>
+      <div class="qty-checkout">
+        <button onclick="alterarQtd('${i.id}', -1)">−</button>
+        <span>${i.qty}</span>
+        <button onclick="alterarQtd('${i.id}', 1)">+</button>
+      </div>
+      <strong style="margin: 0 16px;">${money(i.preco * i.qty)}</strong>
       <button onclick="alterarQtd('${i.id}', -999)" class="del-btn">${ICONS.trash}</button>
     </div>`).join("");
 
   $("#summaryItems").innerHTML = itens.map(i => `<div class="summary-row"><span>${i.qty}x ${esc(i.nome)}</span><span>${money(i.preco * i.qty)}</span></div>`).join("");
-  $("#summaryTotal").textContent = money(cartTotal());
+  
+  const sub = cartTotal();
+  $("#subTotal").textContent = money(sub);
+  
+  if (descontoAplicado > 0) {
+    $("#descontoRow").style.display = "flex";
+    $("#descontoVal").textContent = `- ${money(descontoAplicado)}`;
+    $("#summaryTotal").textContent = money(Math.max(0, sub - descontoAplicado));
+  } else {
+    $("#descontoRow").style.display = "none";
+    $("#summaryTotal").textContent = money(sub);
+  }
+  
   updateConfirmBtn();
+}
+
+async function aplicarCupom() {
+  const codigo = $("#cupomInput").value.trim();
+  if (!codigo) return showToast("Digite um cupom válido.", "error");
+  
+  try {
+    const res = await API.validarCupom(codigo, cartTotal(), $("#cEmail")?.value || "");
+    if (res.ok) {
+      descontoAplicado = res.tipo === 'percentual' ? cartTotal() * (res.valor / 100) : Number(res.valor);
+      showToast("Cupom aplicado com sucesso!");
+      renderCheckout();
+    } else {
+      showToast(res.erro || "Cupom inválido.", "error");
+    }
+  } catch (err) {
+    showToast("Erro ao validar cupom.", "error");
+  }
 }
 
 function updateConfirmBtn() {
@@ -303,31 +337,78 @@ async function finalizarPedido() {
     };
     const res = await API.criarPedido(payload);
     CART = []; saveCart();
-    if (res.pix) abrirModalPix(res.pedido_id, res.pix);
-    else { showToast("Pedido realizado!"); setTimeout(() => location.href = `pedido.html?id=${res.pedido_id}`, 1500); }
+    
+    if (res.pix) {
+      abrirModalPix(res.pedido_id, res.pix);
+    } else {
+      // Se for pagamento na entrega, pula direto pro Obrigado
+      document.getElementById("checkoutMain").style.display = "none";
+      document.getElementById("thankYouScreen").style.display = "flex";
+    }
   } catch (err) { showToast(err.message, "error"); btn.disabled = false; btn.textContent = "Confirmar Pedido"; }
 }
 
-/* ==================== PIX ==================== */
+/* ==================== PIX COM TIMER ==================== */
 function abrirModalPix(pedidoId, pixData) {
   pedidoPixIdGlobal = pedidoId;
   $("#pixQRCode").src = `data:image/jpeg;base64,${pixData.qr_code_base64}`;
   $("#pixCopiaCola").value = pixData.qr_code;
   $("#pixModal").classList.add("open");
-  if (pixCheckInterval) clearInterval(pixCheckInterval);
-  pixCheckInterval = setInterval(async () => {
+  
+  // Limpa timers anteriores
+  if (pixIntervalCheck) clearInterval(pixIntervalCheck);
+  if (pixIntervalTimer) clearInterval(pixIntervalTimer);
+
+  // Timer de 15 minutos (900 segundos)
+  let tempoRestante = 900;
+  const timerElement = $("#pixTimer");
+  
+  const atualizarTimer = () => {
+    const minutos = Math.floor(tempoRestante / 60);
+    const segundos = tempoRestante % 60;
+    timerElement.textContent = `${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+  };
+  atualizarTimer();
+
+  pixIntervalTimer = setInterval(() => {
+    tempoRestante--;
+    atualizarTimer();
+    if (tempoRestante <= 0) {
+      clearInterval(pixIntervalTimer);
+      clearInterval(pixIntervalCheck);
+      $("#pixModal").classList.remove("open");
+      document.getElementById("checkoutMain").style.display = "none";
+      const telaErro = document.getElementById("thankYouScreen");
+      telaErro.innerHTML = `<h1 style="color:var(--perigo)">TEMPO EXCEDIDO</h1><p>O tempo para pagamento expirou.</p><a href="checkout.html" class="btn" style="margin-top:24px;">Tentar Novamente</a>`;
+      telaErro.style.display = "flex";
+    }
+  }, 1000);
+
+  // Verifica pagamento
+  pixIntervalCheck = setInterval(async () => {
     const pedido = await API.getPedido(pedidoId);
     if (pedido.status === 'pago' || pedido.status === 'em_separacao') {
-      clearInterval(pixCheckInterval);
-      $("#pixStatus").textContent = "Pagamento Aprovado!"; $("#pixStatus").style.color = "var(--sucesso)";
-      setTimeout(() => { location.href = `pedido.html?id=${pedidoId}`; }, 2000);
+      clearInterval(pixIntervalCheck);
+      clearInterval(pixIntervalTimer);
+      $("#pixModal").classList.remove("open");
+      
+      // Mostra tela de obrigado
+      document.getElementById("checkoutMain").style.display = "none";
+      document.getElementById("thankYouScreen").style.display = "flex";
     }
   }, 2000); 
 }
-function copiarPix() { const input = $("#pixCopiaCola"); input.select(); document.execCommand("copy"); showToast("Código PIX copiado!"); }
-function fecharModalPix() { if (pixCheckInterval) clearInterval(pixCheckInterval); $("#pixModal").classList.remove("open"); if (pedidoPixIdGlobal) location.href = `pedido.html?id=${pedidoPixIdGlobal}`; }
 
-/* ==================== CONTATO ==================== */
+function copiarPix() { const input = $("#pixCopiaCola"); input.select(); document.execCommand("copy"); showToast("Código PIX copiado!"); }
+function fecharModalPix() { 
+  if (pixIntervalCheck) clearInterval(pixIntervalCheck); 
+  if (pixIntervalTimer) clearInterval(pixIntervalTimer);
+  $("#pixModal").classList.remove("open"); 
+  document.getElementById("checkoutMain").style.display = "none";
+  document.getElementById("thankYouScreen").style.display = "flex"; // Vai pro obrigado mesmo se fechar
+}
+
+/* ==================== CONTATO E INIT ==================== */
 function initContato() {
   const form = $("#contatoForm"); if (!form) return;
   form.addEventListener("submit", async (e) => {
@@ -341,7 +422,6 @@ function initContato() {
   });
 }
 
-/* ==================== INIT ==================== */
 async function init() {
   initTheme(); loadCart();
   renderHeader(); renderFooter(); renderCartDrawer(); renderCartBadge();

@@ -11,7 +11,7 @@
     <header id="app-header"></header>
 
     <main class="section" style="padding-top: 40px;">
-      <div class="container checkout-grid">
+      <div class="container checkout-grid" id="checkoutMain">
         <div>
           <div class="checkout-card">
             <h2>1. Seus itens</h2>
@@ -49,23 +49,38 @@
 
           <div class="checkout-card">
             <h2>4. Como deseja pagar?</h2>
-            <div class="pay-grid" id="methodContainer">
-              <!-- Renderizado via JS -->
-            </div>
+            <div class="pay-grid" id="methodContainer"></div>
           </div>
         </div>
 
         <aside>
           <div class="checkout-summary">
             <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Resumo do Pedido</h2>
+            
+            <!-- Campo de Cupom -->
+            <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+              <input type="text" id="cupomInput" placeholder="Cupom de desconto" style="flex: 1; padding: 10px; border: 1px solid var(--borda); border-radius: 8px; background: var(--bg); color: var(--texto);">
+              <button class="btn-ghost btn" onclick="aplicarCupom()" style="padding: 10px 16px;">Aplicar</button>
+            </div>
+
             <div id="summaryItems"></div>
-            <div class="summary-row"><span>Frete</span><span style="color: var(--sucesso); font-weight: 600;">Grátis</span></div>
+            <div class="summary-row"><span>Subtotal</span><span id="subTotal">R$ 0,00</span></div>
+            <div class="summary-row" id="descontoRow" style="display:none; color:var(--sucesso);"><span>Desconto</span><span id="descontoVal">- R$ 0,00</span></div>
             <div class="summary-total"><span>Total</span><span id="summaryTotal">R$ 0,00</span></div>
             <button class="btn btn-block" id="confirmBtn" style="margin-top: 16px;" disabled>Confirmar Pedido</button>
-            <p class="muted small text-center" style="margin-top: 16px;">🔒 Ambiente 100% Seguro</p>
           </div>
         </aside>
       </div>
+
+      <!-- TELA DE AGRADECIMENTO (Oculta inicialmente) -->
+      <div id="thankYouScreen" class="container">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path></svg>
+        <h1>OBRIGADO!</h1>
+        <p>Seu pedido foi realizado com sucesso.</p>
+        <p style="margin-top: 8px;">As informações foram enviadas para o seu WhatsApp.</p>
+        <a href="produtos.html" class="btn" style="margin-top: 32px;">Voltar para a loja</a>
+      </div>
+
     </main>
 
     <footer id="app-footer"></footer>
@@ -73,21 +88,28 @@
     <div class="overlay" id="overlay"></div>
     <div class="modal" id="modal"><div class="modal-box" id="modalBox"></div></div>
     
+    <!-- MODAL PIX APRIMORADO -->
     <div class="modal" id="pixModal">
-      <div class="modal-box" style="max-width: 440px; text-align: center;">
+      <div class="modal-box pix-box">
         <button class="modal-close" onclick="fecharModalPix()">✕</button>
-        <div style="padding: 32px;">
-          <h2 style="margin-bottom: 8px;">Pague com PIX</h2>
-          <p class="muted" style="margin-bottom: 20px;">Escaneie o código abaixo.</p>
-          <img id="pixQRCode" src="" style="width: 200px; height: 200px; margin: 0 auto; border: 2px solid var(--borda); border-radius: 12px; padding: 8px; background: #fff;">
-          <div style="display: flex; gap: 8px; margin-top: 20px;">
-            <input id="pixCopiaCola" type="text" readonly style="flex: 1; padding: 12px; border: 1px solid var(--borda); border-radius: 8px; background: var(--bg-soft); font-size: 0.85rem;">
-            <button class="btn" onclick="copiarPix()">Copiar</button>
-          </div>
-          <p id="pixStatus" style="margin-top: 24px; font-weight: 700; color: var(--destaque);">Aguardando pagamento...</p>
+        <h2 style="margin-bottom: 8px;">Pague com PIX</h2>
+        <p class="muted" style="margin-bottom: 8px;">Escaneie o código abaixo.</p>
+        
+        <img id="pixQRCode" src="" class="pix-qr-img">
+        
+        <div class="pix-copia-cola-wrap">
+          <input id="pixCopiaCola" type="text" readonly>
+          <button class="btn" onclick="copiarPix()">Copiar</button>
+        </div>
+        
+        <p id="pixStatus" style="margin-top: 16px; font-weight: 700; color: var(--destaque);">Aguardando pagamento...</p>
+        <div class="pix-timer">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span id="pixTimer">15:00</span>
         </div>
       </div>
     </div>
+
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
   </body>
