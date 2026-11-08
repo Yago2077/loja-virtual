@@ -3,9 +3,20 @@ const $$ = (s) => document.querySelectorAll(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const money = (n) => (isNaN(n) ? 0 : n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const CART_KEY = "loja_cart_v5";
+const CART_KEY = "loja_cart_v6";
 const PAGE = document.body.dataset.page || "home";
 let CONFIG = {}, PRODUTOS = [], CART = [];
+
+// Ícones SVG
+const ICONS = {
+  success: `<svg width="24" height="24" fill="none" stroke="var(--sucesso)" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+  error: `<svg width="24" height="24" fill="none" stroke="var(--perigo)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
+  trash: `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
+  cart: `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>`,
+  pix: `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="12" cy="12" r="3"></circle><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>`,
+  card: `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`,
+  cash: `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>`
+};
 
 /* ==================== TOAST ==================== */
 function showToast(msg, type = "success") {
@@ -17,12 +28,12 @@ function showToast(msg, type = "success") {
   }
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;
-  toast.innerHTML = `<span style="font-size:1.5rem;">${type === "success" ? "✅" : "⚠️"}</span> <span style="font-weight:600;">${msg}</span>`;
+  toast.innerHTML = `${ICONS[type]} <span style="font-weight:600;">${msg}</span>`;
   container.appendChild(toast);
   setTimeout(() => { toast.style.animation = "toastIn 0.3s reverse forwards"; setTimeout(() => toast.remove(), 300); }, 3000);
 }
 
-/* ==================== TEMA (CORRIGIDO: 1 CLIQUE) ==================== */
+/* ==================== TEMA ==================== */
 function initTheme() {
   const savedTheme = localStorage.getItem("theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   applyTheme(savedTheme);
@@ -33,8 +44,8 @@ function applyTheme(theme) {
   localStorage.setItem("theme", theme);
   if (icon) {
     icon.innerHTML = theme === "dark" 
-      ? `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>`
-      : `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`;
+      ? `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`
+      : `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
   }
 }
 function toggleTheme() {
@@ -77,13 +88,9 @@ function addCarrinho(id, qty = 1) {
   } else CART.push({ id, qty });
   
   saveCart(); renderCartDrawer(); renderCartBadge(); 
-  
-  const cartBtn = $(".cart-btn");
-  if (cartBtn) { cartBtn.classList.remove("bump"); void cartBtn.offsetWidth; cartBtn.classList.add("bump"); }
-  
-  showToast("Item adicionado ao carrinho!");
   fecharModal();
   setTimeout(() => abrirCarrinho(), 300);
+  showToast("Item adicionado!");
 }
 
 function alterarQtd(id, delta) {
@@ -99,7 +106,6 @@ function alterarQtd(id, delta) {
 /* ==================== HEADER / FOOTER ==================== */
 function renderHeader() {
   const el = $("#app-header"); if (!el) return;
-  // Blog e Contato removidos do menu
   const menu = [
     { href: "index.html", label: "Início", page: "home" }, 
     { href: "produtos.html", label: "Produtos", page: "produtos" },
@@ -111,9 +117,9 @@ function renderHeader() {
       <a href="index.html" class="logo">${esc(CONFIG.nome_loja || "Loja")}</a>
       <nav class="nav">${menu.map((m) => `<a href="${m.href}" class="${PAGE === m.page ? "active" : ""}">${m.label}</a>`).join("")}</nav>
       <div class="header-actions">
-        <button class="icon-btn" onclick="toggleTheme()" title="Alternar Tema"><span id="themeIcon"></span></button>
+        <button class="icon-btn" onclick="toggleTheme()"><span id="themeIcon"></span></button>
         <a href="checkout.html" class="cart-btn">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          ${ICONS.cart}
           <span class="cart-count" id="cartCount">0</span>
         </a>
       </div>
@@ -147,10 +153,10 @@ function renderCartDrawer() {
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--borda); padding-bottom:16px;">
           <div><strong>${esc(i.nome)}</strong><br><small class="muted">${money(i.preco)} x ${i.qty}</small></div>
           <div style="display:flex; gap:8px; align-items:center;">
-            <button onclick="alterarQtd('${i.id}', -1)" class="btn-ghost" style="padding:4px 8px; border:1px solid var(--borda); border-radius:6px;">−</button>
+            <button onclick="alterarQtd('${i.id}', -1)" class="btn-ghost" style="padding:4px 8px; border-radius:6px;">−</button>
             <span>${i.qty}</span>
-            <button onclick="alterarQtd('${i.id}', 1)" class="btn-ghost" style="padding:4px 8px; border:1px solid var(--borda); border-radius:6px;">+</button>
-            <button onclick="alterarQtd('${i.id}', -999)" class="del-btn" style="padding:6px;">🗑</button>
+            <button onclick="alterarQtd('${i.id}', 1)" class="btn-ghost" style="padding:4px 8px; border-radius:6px;">+</button>
+            <button onclick="alterarQtd('${i.id}', -999)" class="del-btn">${ICONS.trash}</button>
           </div>
         </div>`).join("") : '<p class="muted text-center">Seu carrinho está vazio.</p>'}
     </div>
@@ -169,11 +175,10 @@ function cardHTML(p) {
     <article class="card" onclick="abrirProdutoModal('${p.id}')">
       <div class="card-img">
         ${p.imagem ? `<img src="${esc(p.imagem)}" alt="${esc(p.nome)}" loading="lazy">` : `<div style="display:flex; align-items:center; justify-content:center; height:100%; font-size:3rem; opacity:0.2;">${esc(p.nome.charAt(0))}</div>`}
-        ${esgotado ? '<span class="tag">Esgotado</span>' : ""}
       </div>
       <div class="card-body">
         <span class="card-cat">${esc(p.categoria)}</span>
-        <h3>${esc(p.nome)}</h3>
+        <h3 style="font-size:1.1rem;">${esc(p.nome)}</h3>
         <div class="card-foot"><strong>${money(p.preco)}</strong></div>
       </div>
     </article>`;
@@ -207,24 +212,45 @@ function abrirProdutoModal(id) {
 }
 function fecharModal() { $("#modal")?.classList.remove("open"); }
 
-/* ==================== CHECKOUT UNIFICADO ==================== */
+// Busca e Filtro
+function initProdutos() {
+  const grid = $("#productsGrid"), search = $("#searchInput"), catSelect = $("#categorySelect"), noProducts = $("#noProducts");
+  if (!grid) return;
+
+  const cats = [...new Set(PRODUTOS.map(p => p.categoria).filter(Boolean))].sort();
+  catSelect.innerHTML = `<option value="">Todas as categorias</option>` + cats.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+
+  const renderFilter = () => {
+    const termo = search.value.toLowerCase().trim();
+    const cat = catSelect.value;
+    const list = PRODUTOS.filter(p => (p.nome.toLowerCase().includes(termo) || p.descricao.toLowerCase().includes(termo)) && (cat === "" || p.categoria === cat));
+    grid.innerHTML = list.length ? list.map(cardHTML).join("") : "";
+    noProducts.style.display = list.length ? "none" : "block";
+  };
+  search.addEventListener("input", renderFilter);
+  catSelect.addEventListener("change", renderFilter);
+  renderFilter();
+}
+
+/* ==================== CHECKOUT ==================== */
 let checkoutState = { metodo: null, quando: null };
 let pedidoPixIdGlobal = null, pixCheckInterval = null;
 
 function initCheckout() {
-  if (!$("#methodContainer")) return;
+  const container = $("#methodContainer");
+  if (!container) return; // Correção do bug: garante que o container existe
+  
   renderCheckout();
   
-  // Renderiza TODAS as opções de pagamento de forma unificada
   const methods = [
-    { value: "pix_online", label: "PIX Online", desc: "Aprovação imediata", icon: "🔷" },
-    { value: "pix_entrega", label: "PIX na Entrega", desc: "Pague na entrega", icon: "🔷" },
-    { value: "credito_entrega", label: "Cartão de Crédito", desc: "Maquininha na entrega", icon: "💳" },
-    { value: "debito_entrega", label: "Cartão de Débito", desc: "Maquininha na entrega", icon: "💳" },
-    { value: "dinheiro_entrega", label: "Dinheiro", desc: "Pague na entrega", icon: "💵" }
+    { value: "pix_online", label: "PIX Online", desc: "Aprovação imediata", icon: ICONS.pix },
+    { value: "pix_entrega", label: "PIX na Entrega", desc: "Pague na entrega", icon: ICONS.pix },
+    { value: "credito_entrega", label: "Crédito", desc: "Maquininha na entrega", icon: ICONS.card },
+    { value: "debito_entrega", label: "Débito", desc: "Maquininha na entrega", icon: ICONS.card },
+    { value: "dinheiro_entrega", label: "Dinheiro", desc: "Pague na entrega", icon: ICONS.cash }
   ];
 
-  $("#methodContainer").innerHTML = methods.map(m => `
+  container.innerHTML = methods.map(m => `
     <label class="pay-opt">
       <input type="radio" name="payMethod" value="${m.value}">
       <div><strong>${m.icon} ${m.label}</strong><br><small class="muted">${m.desc}</small></div>
@@ -253,11 +279,10 @@ function renderCheckout() {
       <div class="co-item-img">${i.imagem ? `<img src="${esc(i.imagem)}">` : ""}</div>
       <div style="flex:1;"><strong>${esc(i.nome)}</strong><br><small class="muted">${money(i.preco)} x ${i.qty}</small></div>
       <strong style="margin-right:16px;">${money(i.preco * i.qty)}</strong>
-      <button onclick="alterarQtd('${i.id}', -999)" class="del-btn">🗑</button>
+      <button onclick="alterarQtd('${i.id}', -999)" class="del-btn">${ICONS.trash}</button>
     </div>`).join("");
 
   $("#summaryItems").innerHTML = itens.map(i => `<div class="summary-row"><span>${i.qty}x ${esc(i.nome)}</span><span>${money(i.preco * i.qty)}</span></div>`).join("");
-  $("#subTotal").textContent = money(cartTotal());
   $("#summaryTotal").textContent = money(cartTotal());
   updateConfirmBtn();
 }
@@ -268,10 +293,7 @@ function updateConfirmBtn() {
 }
 
 async function finalizarPedido() {
-  const btn = $("#confirmBtn"); 
-  btn.disabled = true; 
-  btn.innerHTML = `<span class="spinner"></span> Processando...`;
-  
+  const btn = $("#confirmBtn"); btn.disabled = true; btn.textContent = "Processando...";
   try {
     const payload = {
       itens: getCartItens().map((i) => ({ id: i.id, qty: i.qty })),
@@ -279,33 +301,25 @@ async function finalizarPedido() {
       endereco: { cep: $("#cCep").value.trim(), logradouro: $("#cEnd").value.trim(), numero: $("#cNum").value.trim(), complemento: $("#cComp")?.value.trim(), bairro: $("#cBairro").value.trim(), cidade: $("#cCidade").value.trim(), estado: $("#cUF").value.trim().toUpperCase() },
       pagamento: { metodo: checkoutState.metodo, quando: checkoutState.quando }
     };
-    
     const res = await API.criarPedido(payload);
     CART = []; saveCart();
-
     if (res.pix) abrirModalPix(res.pedido_id, res.pix);
     else { showToast("Pedido realizado!"); setTimeout(() => location.href = `pedido.html?id=${res.pedido_id}`, 1500); }
-    
-  } catch (err) {
-    showToast(err.message, "error"); 
-    btn.disabled = false; 
-    btn.textContent = "Confirmar Pedido";
-  }
+  } catch (err) { showToast(err.message, "error"); btn.disabled = false; btn.textContent = "Confirmar Pedido"; }
 }
 
-/* ==================== PIX E INIT ==================== */
+/* ==================== PIX ==================== */
 function abrirModalPix(pedidoId, pixData) {
   pedidoPixIdGlobal = pedidoId;
   $("#pixQRCode").src = `data:image/jpeg;base64,${pixData.qr_code_base64}`;
   $("#pixCopiaCola").value = pixData.qr_code;
   $("#pixModal").classList.add("open");
   if (pixCheckInterval) clearInterval(pixCheckInterval);
-  
   pixCheckInterval = setInterval(async () => {
     const pedido = await API.getPedido(pedidoId);
     if (pedido.status === 'pago' || pedido.status === 'em_separacao') {
       clearInterval(pixCheckInterval);
-      $("#pixStatus").textContent = "✅ Pagamento Aprovado!"; $("#pixStatus").style.color = "var(--sucesso)";
+      $("#pixStatus").textContent = "Pagamento Aprovado!"; $("#pixStatus").style.color = "var(--sucesso)";
       setTimeout(() => { location.href = `pedido.html?id=${pedidoId}`; }, 2000);
     }
   }, 2000); 
@@ -313,10 +327,23 @@ function abrirModalPix(pedidoId, pixData) {
 function copiarPix() { const input = $("#pixCopiaCola"); input.select(); document.execCommand("copy"); showToast("Código PIX copiado!"); }
 function fecharModalPix() { if (pixCheckInterval) clearInterval(pixCheckInterval); $("#pixModal").classList.remove("open"); if (pedidoPixIdGlobal) location.href = `pedido.html?id=${pedidoPixIdGlobal}`; }
 
+/* ==================== CONTATO ==================== */
+function initContato() {
+  const form = $("#contatoForm"); if (!form) return;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button'); btn.textContent = "Enviando..."; btn.disabled = true;
+    try {
+      const res = await fetch(`${API_URL}/api/contato`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ nome: e.target.nome.value, email: e.target.email.value, assunto: e.target.assunto.value, msg: e.target.msg.value }) });
+      if(!res.ok) throw new Error('Falha');
+      showToast('Mensagem enviada!'); e.target.reset();
+    } catch (err) { showToast('Erro ao enviar.', 'error'); } finally { btn.textContent = "Enviar mensagem"; btn.disabled = false; }
+  });
+}
+
+/* ==================== INIT ==================== */
 async function init() {
   initTheme(); loadCart();
-  
-  // RENDERIZA O CABEÇALHO IMEDIATAMENTE (Corrige o bug da demora)
   renderHeader(); renderFooter(); renderCartDrawer(); renderCartBadge();
 
   $("#overlay")?.addEventListener("click", fecharCarrinho);
@@ -326,16 +353,15 @@ async function init() {
     CONFIG = parseConfig(await carregarTxt("data/config.txt"));
     PRODUTOS = (await API.getProdutos()).map(p => ({ id: p.id, nome: p.nome, preco: p.preco, categoria: p.categoria_nome || "", imagem: p.imagem_url || "", descricao: p.descricao_curta || p.descricao || "", estoque: p.estoque }));
     
-    // Re-renderiza com as cores e nome corretos da loja
     renderHeader(); renderFooter();
 
     if (PAGE === "home") {
       const grid = $("#homeGrid"); if(grid) grid.innerHTML = PRODUTOS.slice(0,4).map(cardHTML).join("");
       $("#heroTitulo").textContent = CONFIG.nome_loja; $("#heroSlogan").textContent = CONFIG.descricao;
     }
-    if (PAGE === "produtos") { const grid = $("#produtosGrid"); if(grid) grid.innerHTML = PRODUTOS.map(cardHTML).join(""); }
+    if (PAGE === "produtos") initProdutos(); 
+    if (PAGE === "sobre") initContato();
     if (PAGE === "checkout") initCheckout();
-
   } catch (err) { showToast("Erro ao conectar ao servidor.", "error"); }
 }
 

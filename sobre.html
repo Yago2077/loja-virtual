@@ -3,48 +3,56 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sobre · Minha Loja</title>
+    <title>Sobre e Contato · Minha Loja</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body data-page="sobre">
     <header id="app-header"></header>
 
-    <main>
-      <section class="section" style="padding-top: 60px;">
-        <div class="container checkout-grid">
-          <div>
-            <h2>Nossa História</h2>
-            <p class="muted" style="margin: 16px 0; font-size: 1.05rem; line-height: 1.8;">
-              Nascemos em 2020, em uma pequena sala de casa, com a ideia simples de oferecer produtos que a gente mesmo usaria. Sempre acreditamos que comprar online pode ser uma experiência humana — com uma pessoa real do outro lado respondendo suas dúvidas.
-            </p>
-            <p class="muted" style="margin-bottom: 32px; font-size: 1.05rem; line-height: 1.8;">
-              Hoje atendemos todo o Brasil, mas mantemos o mesmo cuidado artesanal: cada pedido é conferido, embalado e despachado por nossa equipe, com carinho.
-            </p>
+    <main class="section" style="padding-top: 60px;">
+      <div class="container checkout-grid">
+        
+        <!-- Coluna Esquerda: Sobre -->
+        <div>
+          <h2 style="font-size: 2rem; margin-bottom: 16px;">Nossa História</h2>
+          <p class="muted" style="margin: 16px 0; font-size: 1.05rem; line-height: 1.8;">
+            Nascemos em 2020, em uma pequena sala de casa, com a ideia simples de oferecer produtos que a gente mesmo usaria. Sempre acreditamos que comprar online pode ser uma experiência humana — com uma pessoa real do outro lado respondendo suas dúvidas.
+          </p>
+          <p class="muted" style="margin-bottom: 32px; font-size: 1.05rem; line-height: 1.8;">
+            Hoje atendemos todo o Brasil, mas mantemos o mesmo cuidado artesanal: cada pedido é conferido, embalado e despachado por nossa equipe, com carinho.
+          </p>
 
-            <h2 style="margin-top: 40px;">Nossos valores</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
-              <div class="checkout-card" style="margin-bottom: 0; padding: 20px;"><strong>🤝 Transparência</strong><p class="muted small" style="margin-top: 8px;">Preço justo, sem pegadinhas.</p></div>
-              <div class="checkout-card" style="margin-bottom: 0; padding: 20px;"><strong>💎 Qualidade</strong><p class="muted small" style="margin-top: 8px;">Só vendemos o que aprovaríamos.</p></div>
-              <div class="checkout-card" style="margin-bottom: 0; padding: 20px;"><strong>⚡ Agilidade</strong><p class="muted small" style="margin-top: 8px;">Resposta em até 2h úteis.</p></div>
-              <div class="checkout-card" style="margin-bottom: 0; padding: 20px;"><strong>♻️ Responsabilidade</strong><p class="muted small" style="margin-top: 8px;">Logística consciente.</p></div>
+          <h2 style="font-size: 1.6rem; margin-top: 40px; margin-bottom: 16px;">Nossos valores</h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="checkout-card" style="margin-bottom: 0; padding: 20px;">
+              <svg width="24" height="24" fill="none" stroke="var(--primaria)" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom:8px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              <strong style="display:block;">Transparência</strong><p class="muted small" style="margin-top: 4px;">Preço justo, sem pegadinhas.</p>
+            </div>
+            <div class="checkout-card" style="margin-bottom: 0; padding: 20px;">
+              <svg width="24" height="24" fill="none" stroke="var(--primaria)" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom:8px;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <strong style="display:block;">Qualidade</strong><p class="muted small" style="margin-top: 4px;">Só vendemos o que aprovaríamos.</p>
+            </div>
+            <div class="checkout-card" style="margin-bottom: 0; padding: 20px;">
+              <svg width="24" height="24" fill="none" stroke="var(--primaria)" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom:8px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              <strong style="display:block;">Agilidade</strong><p class="muted small" style="margin-top: 4px;">Resposta em até 2h úteis.</p>
+            </div>
+            <div class="checkout-card" style="margin-bottom: 0; padding: 20px;">
+              <svg width="24" height="24" fill="none" stroke="var(--primaria)" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom:8px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+              <strong style="display:block;">Responsabilidade</strong><p class="muted small" style="margin-top: 4px;">Logística consciente.</p>
             </div>
           </div>
         </div>
-      </section>
 
-      <!-- CONTATO (Antiga página contato.html) -->
-      <section class="section alt" id="contato">
-        <div class="container" style="max-width: 800px;">
-          <h2 class="text-center" style="margin-bottom: 8px;">Fale conosco</h2>
-          <p class="text-center muted" style="margin-bottom: 32px;">Respondemos em até 2 horas úteis.</p>
-          
+        <!-- Coluna Direita: Contato -->
+        <aside>
           <div class="checkout-card" style="background: var(--bg);">
+            <h2 style="font-size: 1.4rem; text-align: center; border-bottom: none; padding-bottom: 0; margin-bottom: 8px;">Fale conosco</h2>
+            <p class="text-center muted small" style="margin-bottom: 24px;">Respondemos em até 2 horas úteis.</p>
+            
             <form id="contatoForm">
-              <div class="form-row">
-                <div class="field"><label>Seu Nome</label><input name="nome" required placeholder="Como podemos te chamar?"></div>
-                <div class="field"><label>Seu E-mail</label><input name="email" type="email" required placeholder="seu@email.com"></div>
-              </div>
+              <div class="field"><label>Seu Nome *</label><input name="nome" required placeholder="Como podemos te chamar?"></div>
+              <div class="field"><label>Seu E-mail *</label><input name="email" type="email" required placeholder="seu@email.com"></div>
               <div class="field">
                 <label>Assunto</label>
                 <select name="assunto">
@@ -54,15 +62,13 @@
                   <option>Outro</option>
                 </select>
               </div>
-              <div class="field">
-                <label>Mensagem</label>
-                <textarea name="msg" rows="6" required placeholder="Escreva detalhadamente..."></textarea>
-              </div>
+              <div class="field"><label>Mensagem *</label><textarea name="msg" rows="5" required placeholder="Escreva detalhadamente..."></textarea></div>
               <button class="btn btn-block" type="submit">Enviar Mensagem</button>
             </form>
           </div>
-        </div>
-      </section>
+        </aside>
+
+      </div>
     </main>
 
     <footer id="app-footer"></footer>

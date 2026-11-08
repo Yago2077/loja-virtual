@@ -9,19 +9,32 @@
   </head>
   <body data-page="produtos">
     <header id="app-header"></header>
-    <main>
-      <section class="page-head">
-        <div class="container">
-          <h1>Nossos produtos</h1>
-          <p class="muted">Encontre o que você precisa.</p>
+
+    <main class="section" style="padding-top: 40px;">
+      <div class="container">
+        <h1 style="margin-bottom: 24px;">Nossos produtos</h1>
+        
+        <!-- BARRA DE BUSCA E FILTRO -->
+        <div style="display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap;">
+          <div class="field" style="flex: 1; min-width: 250px; margin-bottom: 0; position: relative;">
+            <svg width="20" height="20" fill="none" stroke="var(--muted)" stroke-width="2" viewBox="0 0 24 24" style="position: absolute; left: 16px; top: 16px;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" placeholder="Buscar produto..." style="border-radius: 999px; padding: 16px 20px 16px 48px;">
+          </div>
+          <div class="field" style="width: 250px; margin-bottom: 0;">
+            <select id="categorySelect" style="border-radius: 999px; padding: 16px 20px;">
+              <option value="">Todas as categorias</option>
+            </select>
+          </div>
         </div>
-      </section>
-      <section class="section" style="padding-top: 20px;">
-        <div class="container">
-          <div class="grid" id="produtosGrid"></div>
-        </div>
-      </section>
+
+        <div class="grid" id="productsGrid"></div>
+        
+        <p id="noProducts" class="text-center muted" style="display: none; padding: 60px 0; font-size: 1.1rem;">
+          Nenhum produto encontrado com esses filtros.
+        </p>
+      </div>
     </main>
+
     <footer id="app-footer"></footer>
     <aside class="cart-drawer" id="cartDrawer"></aside>
     <div class="overlay" id="overlay"></div>
