@@ -3,7 +3,7 @@ const $$ = (s) => document.querySelectorAll(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const money = (n) => (isNaN(n) ? 0 : n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const CART_KEY = "loja_cart_v8";
+const CART_KEY = "loja_cart_v9";
 const PAGE = document.body.dataset.page || "home";
 let CONFIG = {}, PRODUTOS = [], CART = [];
 let descontoAplicado = 0;
@@ -87,7 +87,9 @@ function addCarrinho(id, qty = 1) {
     item.qty += qty;
   } else CART.push({ id, qty });
   
-  saveCart(); renderCartDrawer(); renderCartBadge(); 
+  saveCart(); 
+  renderCartDrawer(); 
+  renderCartBadge(); 
   fecharModal();
   setTimeout(() => abrirCarrinho(), 300);
 }
@@ -98,7 +100,10 @@ function alterarQtd(id, delta) {
   item.qty += delta;
   if (item.qty > (parseInt(p?.estoque) || 999)) item.qty = parseInt(p.estoque);
   if (item.qty < 1) CART = CART.filter((i) => i.id !== id);
-  saveCart(); renderCartDrawer(); renderCartBadge();
+  
+  saveCart(); 
+  renderCartDrawer(); 
+  renderCartBadge();
   if (PAGE === "checkout") renderCheckout();
 }
 
@@ -110,6 +115,10 @@ function renderHeader() {
     { href: "produtos.html", label: "Produtos", page: "produtos" },
     { href: "sobre.html", label: "Sobre", page: "sobre" }
   ];
+  
+  // O contador do carrinho agora é calculado no momento que desenha o header
+  const qtdAtual = cartQtd();
+
   el.className = "header";
   el.innerHTML = `
     <div class="container header-inner">
@@ -119,11 +128,16 @@ function renderHeader() {
         <button class="icon-btn" onclick="toggleTheme()"><span id="themeIcon"></span></button>
         <a href="checkout.html" class="cart-btn">
           ${ICONS.cart}
-          <span class="cart-count" id="cartCount">0</span>
+          <span class="cart-count" id="cartCount">${qtdAtual}</span>
         </a>
       </div>
     </div>`;
   applyTheme(localStorage.getItem("theme") || "light");
+}
+
+function renderCartBadge() { 
+  const el = $("#cartCount"); 
+  if (el) el.textContent = cartQtd(); 
 }
 
 function renderFooter() {
@@ -140,7 +154,6 @@ function renderFooter() {
     </div>`;
 }
 
-function renderCartBadge() { const el = $("#cartCount"); if (el) el.textContent = cartQtd(); }
 function renderCartDrawer() {
   const el = $("#cartDrawer"); if (!el) return;
   const itens = getCartItens();
@@ -163,6 +176,7 @@ function renderCartDrawer() {
       <a href="checkout.html" class="btn btn-block">Finalizar Compra</a>
     </div>`;
 }
+
 function abrirCarrinho() { $("#cartDrawer")?.classList.add("open"); $("#overlay")?.classList.add("show"); }
 function fecharCarrinho() { $("#cartDrawer")?.classList.remove("open"); $("#overlay")?.classList.remove("show"); }
 
@@ -195,11 +209,12 @@ function abrirProdutoModal(id) {
       <h2>${esc(p.nome)}</h2>
       <p class="muted">${esc(p.descricao)}</p>
       <p style="font-size:1.8rem; font-weight:800; color:var(--primaria);">${money(p.preco)}</p>
+      
       ${!esgotado ? `
-      <div style="display: flex; gap: 16px; margin-top: 16px;">
-        <div class="qty-checkout" style="padding: 8px;">
+      <div style="display: flex; gap: 16px; margin-top: 16px; align-items: stretch;">
+        <div class="qty-checkout">
           <button onclick="document.getElementById('mQty').value = Math.max(1, parseInt(document.getElementById('mQty').value) - 1)">−</button>
-          <input type="number" id="mQty" value="1" min="1" readonly style="width:40px; text-align:center; border:none; background:transparent; color:var(--texto); pointer-events:none; font-weight:bold;">
+          <input type="number" id="mQty" value="1" min="1" readonly>
           <button onclick="document.getElementById('mQty').value = Math.min(${p.estoque}, parseInt(document.getElementById('mQty').value) + 1)">+</button>
         </div>
         <button class="btn" style="flex:1;" onclick="addCarrinho('${p.id}', parseInt(document.getElementById('mQty').value))">Adicionar</button>
@@ -241,7 +256,6 @@ function initCheckout() {
   const methodsOnline = [
     { value: "pix_online", label: "PIX Online", desc: "Aprovação imediata", icon: ICONS.pix }
   ];
-
   const methodsDelivery = [
     { value: "pix_entrega", label: "PIX na Entrega", desc: "Pague na entrega", icon: ICONS.pix },
     { value: "credito_entrega", label: "Crédito", desc: "Maquininha na entrega", icon: ICONS.card },
@@ -338,7 +352,7 @@ async function finalizarPedido() {
       cliente: { nome: $("#cNome").value.trim(), email: $("#cEmail").value.trim(), telefone: $("#cFone").value.trim(), cpf: $("#cCpf").value.trim() },
       endereco: { cep: $("#cCep").value.trim(), logradouro: $("#cEnd").value.trim(), numero: $("#cNum").value.trim(), complemento: $("#cComp")?.value.trim(), bairro: $("#cBairro").value.trim(), cidade: $("#cCidade").value.trim(), estado: $("#cUF").value.trim().toUpperCase() },
       pagamento: { metodo: checkoutState.metodo, quando: checkoutState.quando },
-      cupom_codigo: $("#cupomInput")?.value.trim() || null // Passa nulo se estiver vazio
+      cupom_codigo: $("#cupomInput")?.value.trim() || null
     };
     const res = await API.criarPedido(payload);
     CART = []; saveCart();
@@ -407,7 +421,7 @@ function fecharModalPix() {
   document.getElementById("thankYouScreen").style.display = "flex";
 }
 
-/* ==================== CONTATO E INIT ==================== */
+/* ==================== INIT ==================== */
 function initContato() {
   const form = $("#contatoForm"); if (!form) return;
   form.addEventListener("submit", async (e) => {
@@ -423,7 +437,7 @@ function initContato() {
 
 async function init() {
   initTheme(); loadCart();
-  renderHeader(); renderFooter(); renderCartDrawer(); renderCartBadge();
+  renderHeader(); renderFooter(); renderCartDrawer(); 
 
   $("#overlay")?.addEventListener("click", fecharCarrinho);
   $("#modal")?.addEventListener("click", (e) => { if (e.target.id === "modal") fecharModal(); });
