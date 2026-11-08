@@ -49,7 +49,19 @@
 
           <div class="checkout-card">
             <h2>4. Como deseja pagar?</h2>
-            <div class="pay-grid" id="methodContainer"></div>
+            
+            <!-- Pagamento Online -->
+            <div class="pay-section">
+              <h3>Pagar no site</h3>
+              <div class="pay-grid single" id="methodOnline"></div>
+            </div>
+
+            <!-- Pagamento na Entrega -->
+            <div class="pay-section">
+              <h3>Pagar na entrega</h3>
+              <div class="pay-grid" id="methodDelivery"></div>
+            </div>
+
           </div>
         </div>
 
@@ -57,7 +69,6 @@
           <div class="checkout-summary">
             <h2 style="font-size: 1.2rem; margin-bottom: 20px;">Resumo do Pedido</h2>
             
-            <!-- Campo de Cupom -->
             <div style="display: flex; gap: 8px; margin-bottom: 16px;">
               <input type="text" id="cupomInput" placeholder="Cupom de desconto" style="flex: 1; padding: 10px; border: 1px solid var(--borda); border-radius: 8px; background: var(--bg); color: var(--texto);">
               <button class="btn-ghost btn" onclick="aplicarCupom()" style="padding: 10px 16px;">Aplicar</button>
@@ -72,7 +83,7 @@
         </aside>
       </div>
 
-      <!-- TELA DE AGRADECIMENTO (Oculta inicialmente) -->
+      <!-- TELA DE AGRADECIMENTO -->
       <div id="thankYouScreen" class="container">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path></svg>
         <h1>OBRIGADO!</h1>
@@ -88,20 +99,17 @@
     <div class="overlay" id="overlay"></div>
     <div class="modal" id="modal"><div class="modal-box" id="modalBox"></div></div>
     
-    <!-- MODAL PIX APRIMORADO -->
+    <!-- MODAL PIX -->
     <div class="modal" id="pixModal">
       <div class="modal-box pix-box">
         <button class="modal-close" onclick="fecharModalPix()">✕</button>
         <h2 style="margin-bottom: 8px;">Pague com PIX</h2>
         <p class="muted" style="margin-bottom: 8px;">Escaneie o código abaixo.</p>
-        
         <img id="pixQRCode" src="" class="pix-qr-img">
-        
         <div class="pix-copia-cola-wrap">
           <input id="pixCopiaCola" type="text" readonly>
           <button class="btn" onclick="copiarPix()">Copiar</button>
         </div>
-        
         <p id="pixStatus" style="margin-top: 16px; font-weight: 700; color: var(--destaque);">Aguardando pagamento...</p>
         <div class="pix-timer">
           <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>

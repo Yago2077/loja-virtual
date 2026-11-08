@@ -3,13 +3,12 @@ const $$ = (s) => document.querySelectorAll(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const money = (n) => (isNaN(n) ? 0 : n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const CART_KEY = "loja_cart_v7";
+const CART_KEY = "loja_cart_v8";
 const PAGE = document.body.dataset.page || "home";
 let CONFIG = {}, PRODUTOS = [], CART = [];
-let descontoAplicado = 0; // Guarda o valor do desconto do cupom
+let descontoAplicado = 0;
 let pixIntervalCheck = null, pixIntervalTimer = null;
 
-// Ícones SVG
 const ICONS = {
   success: `<svg width="24" height="24" fill="none" stroke="var(--sucesso)" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
   error: `<svg width="24" height="24" fill="none" stroke="var(--perigo)" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>`,
@@ -91,7 +90,6 @@ function addCarrinho(id, qty = 1) {
   saveCart(); renderCartDrawer(); renderCartBadge(); 
   fecharModal();
   setTimeout(() => abrirCarrinho(), 300);
-  // Notificação de item adicionado REMOVIDA conforme solicitado
 }
 
 function alterarQtd(id, delta) {
@@ -101,10 +99,10 @@ function alterarQtd(id, delta) {
   if (item.qty > (parseInt(p?.estoque) || 999)) item.qty = parseInt(p.estoque);
   if (item.qty < 1) CART = CART.filter((i) => i.id !== id);
   saveCart(); renderCartDrawer(); renderCartBadge();
-  if (PAGE === "checkout") renderCheckout(); // Atualiza a tela de checkout se estiver nela
+  if (PAGE === "checkout") renderCheckout();
 }
 
-/* ==================== HEADER / FOOTER ==================== */
+/* ==================== HEADER / FOOTER / DRAWER ==================== */
 function renderHeader() {
   const el = $("#app-header"); if (!el) return;
   const menu = [
@@ -142,7 +140,6 @@ function renderFooter() {
     </div>`;
 }
 
-/* ==================== DRAWER / CART ==================== */
 function renderCartBadge() { const el = $("#cartCount"); if (el) el.textContent = cartQtd(); }
 function renderCartDrawer() {
   const el = $("#cartDrawer"); if (!el) return;
@@ -235,25 +232,33 @@ let checkoutState = { metodo: null, quando: null };
 let pedidoPixIdGlobal = null;
 
 function initCheckout() {
-  const container = $("#methodContainer");
-  if (!container) return;
+  const containerOnline = $("#methodOnline");
+  const containerDelivery = $("#methodDelivery");
+  if (!containerOnline || !containerDelivery) return;
+  
   renderCheckout();
   
-  const methods = [
-    { value: "pix_online", label: "PIX Online", desc: "Aprovação imediata", icon: ICONS.pix },
+  const methodsOnline = [
+    { value: "pix_online", label: "PIX Online", desc: "Aprovação imediata", icon: ICONS.pix }
+  ];
+
+  const methodsDelivery = [
     { value: "pix_entrega", label: "PIX na Entrega", desc: "Pague na entrega", icon: ICONS.pix },
     { value: "credito_entrega", label: "Crédito", desc: "Maquininha na entrega", icon: ICONS.card },
     { value: "debito_entrega", label: "Débito", desc: "Maquininha na entrega", icon: ICONS.card },
     { value: "dinheiro_entrega", label: "Dinheiro", desc: "Pague na entrega", icon: ICONS.cash }
   ];
 
-  container.innerHTML = methods.map(m => `
+  const renderHTML = (m) => `
     <label class="pay-opt">
       <input type="radio" name="payMethod" value="${m.value}">
       <div class="pay-icon">${m.icon}</div>
       <div class="pay-info"><strong>${m.label}</strong><small>${m.desc}</small></div>
     </label>
-  `).join("");
+  `;
+
+  containerOnline.innerHTML = methodsOnline.map(renderHTML).join("");
+  containerDelivery.innerHTML = methodsDelivery.map(renderHTML).join("");
 
   $$('input[name="payMethod"]').forEach((r) => r.addEventListener("change", (e) => {
     const [metodo, quando] = e.target.value.split('_');
@@ -272,7 +277,6 @@ function renderCheckout() {
     return;
   }
   
-  // Quantidade alterável no checkout
   $("#checkoutItems").innerHTML = itens.map(i => `
     <div class="co-item">
       <div class="co-item-img">${i.imagem ? `<img src="${esc(i.imagem)}">` : ""}</div>
@@ -333,7 +337,8 @@ async function finalizarPedido() {
       itens: getCartItens().map((i) => ({ id: i.id, qty: i.qty })),
       cliente: { nome: $("#cNome").value.trim(), email: $("#cEmail").value.trim(), telefone: $("#cFone").value.trim(), cpf: $("#cCpf").value.trim() },
       endereco: { cep: $("#cCep").value.trim(), logradouro: $("#cEnd").value.trim(), numero: $("#cNum").value.trim(), complemento: $("#cComp")?.value.trim(), bairro: $("#cBairro").value.trim(), cidade: $("#cCidade").value.trim(), estado: $("#cUF").value.trim().toUpperCase() },
-      pagamento: { metodo: checkoutState.metodo, quando: checkoutState.quando }
+      pagamento: { metodo: checkoutState.metodo, quando: checkoutState.quando },
+      cupom_codigo: $("#cupomInput")?.value.trim() || null // Passa nulo se estiver vazio
     };
     const res = await API.criarPedido(payload);
     CART = []; saveCart();
@@ -341,25 +346,22 @@ async function finalizarPedido() {
     if (res.pix) {
       abrirModalPix(res.pedido_id, res.pix);
     } else {
-      // Se for pagamento na entrega, pula direto pro Obrigado
       document.getElementById("checkoutMain").style.display = "none";
       document.getElementById("thankYouScreen").style.display = "flex";
     }
   } catch (err) { showToast(err.message, "error"); btn.disabled = false; btn.textContent = "Confirmar Pedido"; }
 }
 
-/* ==================== PIX COM TIMER ==================== */
+/* ==================== PIX ==================== */
 function abrirModalPix(pedidoId, pixData) {
   pedidoPixIdGlobal = pedidoId;
   $("#pixQRCode").src = `data:image/jpeg;base64,${pixData.qr_code_base64}`;
   $("#pixCopiaCola").value = pixData.qr_code;
   $("#pixModal").classList.add("open");
   
-  // Limpa timers anteriores
   if (pixIntervalCheck) clearInterval(pixIntervalCheck);
   if (pixIntervalTimer) clearInterval(pixIntervalTimer);
 
-  // Timer de 15 minutos (900 segundos)
   let tempoRestante = 900;
   const timerElement = $("#pixTimer");
   
@@ -384,15 +386,12 @@ function abrirModalPix(pedidoId, pixData) {
     }
   }, 1000);
 
-  // Verifica pagamento
   pixIntervalCheck = setInterval(async () => {
     const pedido = await API.getPedido(pedidoId);
     if (pedido.status === 'pago' || pedido.status === 'em_separacao') {
       clearInterval(pixIntervalCheck);
       clearInterval(pixIntervalTimer);
       $("#pixModal").classList.remove("open");
-      
-      // Mostra tela de obrigado
       document.getElementById("checkoutMain").style.display = "none";
       document.getElementById("thankYouScreen").style.display = "flex";
     }
@@ -405,7 +404,7 @@ function fecharModalPix() {
   if (pixIntervalTimer) clearInterval(pixIntervalTimer);
   $("#pixModal").classList.remove("open"); 
   document.getElementById("checkoutMain").style.display = "none";
-  document.getElementById("thankYouScreen").style.display = "flex"; // Vai pro obrigado mesmo se fechar
+  document.getElementById("thankYouScreen").style.display = "flex";
 }
 
 /* ==================== CONTATO E INIT ==================== */
