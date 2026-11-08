@@ -4,58 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Início · Minha Loja</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body data-page="home">
     <header id="app-header"></header>
-
     <main>
-      <section class="hero">
-        <div class="container hero-inner">
-          <div class="hero-text">
-            <span class="badge">✨ Novidades toda semana</span>
-            <h1 id="heroTitulo">Sua loja favorita online</h1>
-            <p id="heroSlogan" class="muted">
-              Produtos de qualidade, entrega rápida e pagamento seguro.
-            </p>
-            <div class="hero-actions">
-              <a href="produtos.html" class="btn btn-lg">Ver produtos →</a>
-              <a href="sobre.html" class="btn btn-ghost btn-lg">Conheça a loja</a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="trust">
-        <div class="container trust-grid">
-          <div class="trust-item">
-            <span class="trust-ico">🔒</span>
-            <div><strong>Pagamento seguro</strong><br><small class="muted">PIX, cartão e dinheiro</small></div>
-          </div>
-          <div class="trust-item">
-            <span class="trust-ico">🚚</span>
-            <div><strong>Entrega rápida</strong><br><small class="muted">Envio em 24h úteis</small></div>
-          </div>
-          <div class="trust-item">
-            <span class="trust-ico">↩️</span>
-            <div><strong>Troca fácil</strong><br><small class="muted">7 dias para trocar</small></div>
-          </div>
-          <div class="trust-item">
-            <span class="trust-ico">💬</span>
-            <div><strong>Atendimento humano</strong><br><small class="muted">Por WhatsApp e e-mail</small></div>
+      <section class="section" style="background: linear-gradient(135deg, var(--bg-soft), var(--bg)); padding: 100px 0;">
+        <div class="container" style="max-width: 800px; text-align: center;">
+          <span class="badge" style="background: var(--primaria-soft); color: var(--primaria); padding: 8px 16px; border-radius: 999px; font-weight: 600; font-size: 0.9rem; margin-bottom: 24px; display: inline-block;">✨ Novidades toda semana</span>
+          <h1 id="heroTitulo" style="font-size: clamp(3rem, 6vw, 4.5rem); line-height: 1.1; margin-bottom: 24px; letter-spacing: -0.04em; color: var(--texto);">Sua loja favorita</h1>
+          <p id="heroSlogan" class="muted" style="font-size: 1.2rem; max-width: 600px; margin: 0 auto 40px;">Produtos de qualidade, entrega rápida e pagamento seguro.</p>
+          <div style="display: flex; gap: 16px; justify-content: center;">
+            <a href="produtos.html" class="btn" style="padding: 16px 32px; font-size: 1.1rem;">Ver Produtos</a>
+            <a href="sobre.html" class="btn-ghost btn" style="padding: 16px 32px; font-size: 1.1rem;">Conheça a Loja</a>
           </div>
         </div>
       </section>
 
       <section class="section">
         <div class="container">
-          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px;">
             <div>
-              <h2>Destaques da semana</h2>
-              <p class="muted">Os produtos mais procurados pelos clientes.</p>
+              <h2 style="font-size: 2rem; letter-spacing: -0.03em;">Destaques da semana</h2>
+              <p class="muted">Os produtos mais procurados.</p>
             </div>
             <a href="produtos.html" style="color: var(--primaria); font-weight: 600;">Ver todos →</a>
           </div>
@@ -63,13 +35,10 @@
         </div>
       </section>
     </main>
-
     <footer id="app-footer"></footer>
-    
     <aside class="cart-drawer" id="cartDrawer"></aside>
     <div class="overlay" id="overlay"></div>
     <div class="modal" id="modal"><div class="modal-box" id="modalBox"></div></div>
-
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
   </body>

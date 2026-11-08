@@ -4,112 +4,59 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pedido · Minha Loja</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body data-page="pedido">
     <header id="app-header"></header>
-
     <main class="section">
       <div class="container">
-        <div id="pedidoContainer">
-          <p class="text-center muted">Carregando...</p>
-        </div>
+        <div id="pedidoContainer"><p class="text-center muted">Carregando...</p></div>
       </div>
     </main>
-
     <footer id="app-footer"></footer>
-
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
     <script>
       async function carregarPedido() {
         const id = new URLSearchParams(location.search).get("id");
         const box = document.getElementById("pedidoContainer");
-        if (!id) {
-          box.innerHTML = '<p class="text-center">Pedido inválido.</p>';
-          return;
-        }
+        if (!id) return box.innerHTML = '<p class="text-center">Pedido inválido.</p>';
 
         try {
           const p = await API.getPedido(id);
-
-          const itensHtml = p.order_items
-            .map(
-              (i) => `
-            <div class="recibo-item">
-              <span><strong>${i.quantidade}x</strong> ${i.produto_nome}</span>
-              <span>${money(i.subtotal)}</span>
-            </div>`,
-            )
-            .join("");
-
-          const historicoHtml = (p.order_status_history || [])
-            .sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em))
-            .map(
-              (h) =>
-                `<li><strong>${h.status.toUpperCase()}</strong> <br><small class="muted">${new Date(h.criado_em).toLocaleString("pt-BR")}</small></li>`,
-            )
-            .join("");
-
+          const itensHtml = p.order_items.map(i => `<div class="recibo-item"><span><strong>${i.quantidade}x</strong> ${i.produto_nome}</span><span>${money(i.subtotal)}</span></div>`).join("");
+          
           box.innerHTML = `
           <div class="recibo-box" id="reciboBox">
             <div class="recibo-header">
-              <div>
-                <h1>✅ SEU PEDIDO #${p.id.substring(0, 6).toUpperCase()}</h1>
-                <p class="muted">${new Date(p.criado_em).toLocaleString("pt-BR")}</p>
-              </div>
+              <div><h1>✅ Pedido #${p.id.substring(0,6).toUpperCase()}</h1><p class="muted">${new Date(p.criado_em).toLocaleString("pt-BR")}</p></div>
               <span style="background:var(--primaria-soft); color:var(--primaria); padding:6px 16px; border-radius:20px; font-weight:700; font-size:0.85rem;">${p.status.toUpperCase()}</span>
             </div>
-
             <h3 style="margin-bottom:12px;">Itens</h3>
             ${itensHtml}
-
-            <h3 style="margin-top:32px; margin-bottom:12px;">Valor</h3>
-            <div class="recibo-item"><span>Subtotal</span><span>${money(p.subtotal)}</span></div>
-            ${p.desconto > 0 ? `<div class="recibo-item" style="color:var(--sucesso)"><span>Desconto</span><span>- ${money(p.desconto)}</span></div>` : ""}
-            <div class="recibo-total"><span>Total do Pedido</span><span>${money(p.total)}</span></div>
-
-            <h3 style="margin-top:32px; margin-bottom:12px;">Forma de Pagamento</h3>
-            <p class="muted">❖ Pgt. ${p.payment_timing === "online" ? "Online" : "na entrega"} (${p.payment_method.toUpperCase()})</p>
-            <p class="muted">↳ VALOR: ${money(p.total)}</p>
-            ${p.payment_gateway_id ? `<p class="muted" style="word-break:break-all;">↳ COD. PAGAMENTO: ${p.payment_gateway_id}</p>` : ""}
-
+            <h3 style="margin-top:32px; margin-bottom:12px;">Pagamento</h3>
+            <p class="muted">❖ ${p.payment_timing === 'online' ? 'Online' : 'Na entrega'} (${p.payment_method.toUpperCase()})</p>
+            <p class="muted">↳ Total: ${money(p.total)}</p>
             <h3 style="margin-top:32px; margin-bottom:12px;">Entrega</h3>
-            <p class="muted">${p.endereco_logradouro}, ${p.endereco_numero}${p.endereco_complemento ? ", " + p.endereco_complemento : ""}, ${p.endereco_bairro}, ${p.endereco_cidade} - ${p.endereco_estado}</p>
-            <p class="muted" style="margin-top:8px;"><strong>Previsão:</strong> Em até 3 dias úteis</p>
-
+            <p class="muted">${p.endereco_logradouro}, ${p.endereco_numero}, ${p.endereco_bairro} - ${p.endereco_cidade}/${p.endereco_estado}</p>
             <div style="margin-top:40px; text-align:center;">
-              <button onclick="mostrarAgradecimento()" class="btn">Continuar comprando</button>
+              <button onclick="mostrarAgradecimento()" class="btn">Continuar Comprando</button>
             </div>
           </div>
-
-          <!-- TELA DE OBRIGADO -->
           <div id="telaObrigado" style="display:none; text-align:center; padding:60px 20px; animation: fadeIn 0.5s ease;">
-            <h1 style="font-size:2.5rem; color:var(--primaria); margin-bottom:24px; font-weight:800;">OBRIGADO PELA PREFERÊNCIA!</h1>
-            <div style="display:flex; justify-content:center;">
-              <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="var(--sucesso)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path>
-              </svg>
-            </div>
+            <h1 style="font-size:2.5rem; color:var(--primaria); margin-bottom:24px; font-weight:800;">OBRIGADO!</h1>
+            <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="var(--sucesso)" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9 12l2 2 4-4"></path></svg>
             <p class="muted" style="margin-top:24px;">Redirecionando...</p>
-          </div>
-          `;
-        } catch (err) {
-          box.innerHTML = `<p class="text-center muted">Pedido não encontrado.</p>`;
-        }
+          </div>`;
+        } catch (err) { box.innerHTML = `<p class="text-center muted">Pedido não encontrado.</p>`; }
       }
 
       function mostrarAgradecimento() {
-        document.getElementById("reciboBox").style.display = "none";
-        document.getElementById("telaObrigado").style.display = "block";
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        setTimeout(() => {
-          window.location.href = "produtos.html";
-        }, 3000);
+        document.getElementById('reciboBox').style.display = 'none';
+        document.getElementById('telaObrigado').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setTimeout(() => location.href = 'produtos.html', 3000);
       }
       APP_READY.then(carregarPedido);
     </script>
