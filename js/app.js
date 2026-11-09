@@ -3,7 +3,7 @@ const $$ = (s) => document.querySelectorAll(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 const money = (n) => (isNaN(n) ? 0 : n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-const CART_KEY = "loja_cart_v9";
+const CART_KEY = "loja_cart_v10";
 const PAGE = document.body.dataset.page || "home";
 let CONFIG = {}, PRODUTOS = [], CART = [];
 let descontoAplicado = 0;
@@ -16,7 +16,8 @@ const ICONS = {
   cart: `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>`,
   pix: `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="12" cy="12" r="3"></circle><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line></svg>`,
   card: `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>`,
-  cash: `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>`
+  cash: `<svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"></rect><circle cx="12" cy="12" r="2"></circle><path d="M6 12h.01M18 12h.01"></path></svg>`,
+  fire: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"></path></svg>`
 };
 
 function showToast(msg, type = "success") {
@@ -75,7 +76,7 @@ async function carregarTxt(path) {
 function loadCart() { try { CART = JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { CART = []; } }
 function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(CART)); }
 function getCartItens() { return CART.map((i) => { const p = PRODUTOS.find((x) => x.id === i.id); return p ? { ...p, qty: i.qty } : null; }).filter(Boolean); }
-function cartTotal() { return getCartItens().reduce((s, i) => s + (parseFloat(i.preco) || 0) * i.qty, 0); }
+function cartTotal() { return getCartItens().reduce((s, i) => s + (parseFloat(i.precoFinal) || 0) * i.qty, 0); }
 function cartQtd() { return getCartItens().reduce((s, i) => s + i.qty, 0); }
 
 function addCarrinho(id, qty = 1) {
@@ -87,9 +88,7 @@ function addCarrinho(id, qty = 1) {
     item.qty += qty;
   } else CART.push({ id, qty });
   
-  saveCart(); 
-  renderCartDrawer(); 
-  renderCartBadge(); 
+  saveCart(); renderCartDrawer(); renderCartBadge(); 
   fecharModal();
   setTimeout(() => abrirCarrinho(), 300);
 }
@@ -101,22 +100,14 @@ function alterarQtd(id, delta) {
   if (item.qty > (parseInt(p?.estoque) || 999)) item.qty = parseInt(p.estoque);
   if (item.qty < 1) CART = CART.filter((i) => i.id !== id);
   
-  saveCart(); 
-  renderCartDrawer(); 
-  renderCartBadge();
+  saveCart(); renderCartDrawer(); renderCartBadge();
   if (PAGE === "checkout") renderCheckout();
 }
 
-/* ==================== HEADER / FOOTER / DRAWER ==================== */
+/* ==================== RENDERIZAÇÃO ==================== */
 function renderHeader() {
   const el = $("#app-header"); if (!el) return;
-  const menu = [
-    { href: "index.html", label: "Início", page: "home" }, 
-    { href: "produtos.html", label: "Produtos", page: "produtos" },
-    { href: "sobre.html", label: "Sobre", page: "sobre" }
-  ];
-  
-  // O contador do carrinho agora é calculado no momento que desenha o header
+  const menu = [{ href: "index.html", label: "Início", page: "home" }, { href: "produtos.html", label: "Produtos", page: "produtos" }, { href: "sobre.html", label: "Sobre", page: "sobre" }];
   const qtdAtual = cartQtd();
 
   el.className = "header";
@@ -126,19 +117,13 @@ function renderHeader() {
       <nav class="nav">${menu.map((m) => `<a href="${m.href}" class="${PAGE === m.page ? "active" : ""}">${m.label}</a>`).join("")}</nav>
       <div class="header-actions">
         <button class="icon-btn" onclick="toggleTheme()"><span id="themeIcon"></span></button>
-        <a href="checkout.html" class="cart-btn">
-          ${ICONS.cart}
-          <span class="cart-count" id="cartCount">${qtdAtual}</span>
-        </a>
+        <a href="checkout.html" class="cart-btn">${ICONS.cart}<span class="cart-count" id="cartCount">${qtdAtual}</span></a>
       </div>
     </div>`;
   applyTheme(localStorage.getItem("theme") || "light");
 }
 
-function renderCartBadge() { 
-  const el = $("#cartCount"); 
-  if (el) el.textContent = cartQtd(); 
-}
+function renderCartBadge() { const el = $("#cartCount"); if (el) el.textContent = cartQtd(); }
 
 function renderFooter() {
   const el = $("#app-footer"); if (!el) return;
@@ -162,7 +147,7 @@ function renderCartDrawer() {
     <div class="cart-items">
       ${itens.length ? itens.map((i) => `
         <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--borda); padding-bottom:16px;">
-          <div><strong>${esc(i.nome)}</strong><br><small class="muted">${money(i.preco)} x ${i.qty}</small></div>
+          <div><strong>${esc(i.nome)}</strong><br><small class="muted">${money(i.precoFinal)} x ${i.qty}</small></div>
           <div class="qty-checkout">
             <button onclick="alterarQtd('${i.id}', -1)">−</button>
             <span>${i.qty}</span>
@@ -180,18 +165,46 @@ function renderCartDrawer() {
 function abrirCarrinho() { $("#cartDrawer")?.classList.add("open"); $("#overlay")?.classList.add("show"); }
 function fecharCarrinho() { $("#cartDrawer")?.classList.remove("open"); $("#overlay")?.classList.remove("show"); }
 
-/* ==================== PRODUTOS ==================== */
+/* ==================== CARDS DE PRODUTO ==================== */
 function cardHTML(p) {
   const esgotado = (parseInt(p.estoque) || 0) <= 0;
+  
+  const hasDiscount = p.preco_desconto && Number(p.preco_desconto) > 0 && Number(p.preco_desconto) < Number(p.preco);
+  const precoFinal = hasDiscount ? Number(p.preco_desconto) : Number(p.preco);
+  const descontoPercent = hasDiscount ? Math.round(((Number(p.preco) - precoFinal) / Number(p.preco)) * 100) : 0;
+
+  const dataCriacao = new Date(p.criado_em);
+  const hoje = new Date();
+  const diffDias = Math.ceil((hoje - dataCriacao) / (1000 * 60 * 60 * 24));
+  const isNovo = diffDias <= 7;
+
+  const isMaisVendido = p.mais_vendido || (p.vendas_totais >= 5);
+
   return `
-    <article class="card" onclick="abrirProdutoModal('${p.id}')">
+    <article class="card ${esgotado ? 'esgotado' : ''}" onclick="abrirProdutoModal('${p.id}')">
       <div class="card-img">
-        ${p.imagem ? `<img src="${esc(p.imagem)}" alt="${esc(p.nome)}" loading="lazy">` : `<div style="display:flex; align-items:center; justify-content:center; height:100%; font-size:3rem; opacity:0.2;">${esc(p.nome.charAt(0))}</div>`}
+        ${p.imagem ? `<img src="${esc(p.imagem)}" alt="${esc(p.nome)}" loading="lazy">` : `<div class="img-placeholder">${esc(p.nome.charAt(0))}</div>`}
+        
+        <div class="tags-container">
+          ${isMaisVendido ? `<span class="tag tag-fire">${ICONS.fire} Mais Vendido</span>` : ""}
+          ${isNovo ? `<span class="tag tag-new">✨ Novo</span>` : ""}
+          ${esgotado ? `<span class="tag tag-out">Esgotado</span>` : ""}
+        </div>
+
+        ${hasDiscount && !esgotado ? `<span class="tag-discount">-${descontoPercent}%</span>` : ""}
       </div>
+      
       <div class="card-body">
         <span class="card-cat">${esc(p.categoria)}</span>
-        <h3 style="font-size:1.1rem;">${esc(p.nome)}</h3>
-        <div class="card-foot"><strong>${money(p.preco)}</strong></div>
+        <h3>${esc(p.nome)}</h3>
+        <div class="card-foot">
+          ${hasDiscount 
+            ? `<div>
+                 <span class="price-old">${money(p.preco)}</span>
+                 <strong class="price-new">${money(precoFinal)}</strong>
+               </div>` 
+            : `<strong class="price-normal">${money(p.preco)}</strong>`}
+        </div>
       </div>
     </article>`;
 }
@@ -201,15 +214,25 @@ function abrirProdutoModal(id) {
   const esgotado = (parseInt(p.estoque) || 0) <= 0;
   const modal = $("#modal"), box = $("#modalBox"); if (!modal || !box) return;
 
+  const hasDiscount = p.preco_desconto && Number(p.preco_desconto) > 0 && Number(p.preco_desconto) < Number(p.preco);
+  const precoFinal = hasDiscount ? Number(p.preco_desconto) : Number(p.preco);
+
   box.innerHTML = `
     <button class="modal-close" onclick="fecharModal()">✕</button>
-    <div class="modal-img-wrap">${p.imagem ? `<img src="${esc(p.imagem)}">` : ""}</div>
+    <div class="modal-img-wrap">
+      ${p.imagem ? `<img src="${esc(p.imagem)}">` : ""}
+      ${p.mais_vendido || (p.vendas_totais >= 5) ? `<span class="tag tag-fire" style="position:absolute; top:16px; left:16px;">${ICONS.fire} Mais Vendido</span>` : ""}
+    </div>
     <div class="modal-info">
       <span class="card-cat">${esc(p.categoria)}</span>
       <h2>${esc(p.nome)}</h2>
       <p class="muted">${esc(p.descricao)}</p>
-      <p style="font-size:1.8rem; font-weight:800; color:var(--primaria);">${money(p.preco)}</p>
       
+      <div style="margin-top: 8px;">
+        ${hasDiscount ? `<span class="price-old" style="font-size:1rem;">${money(p.preco)}</span>` : ""}
+        <p style="font-size:1.8rem; font-weight:800; color:${hasDiscount ? 'var(--sucesso)' : 'var(--primaria)'};">${money(precoFinal)}</p>
+      </div>
+
       ${!esgotado ? `
       <div style="display: flex; gap: 16px; margin-top: 16px; align-items: stretch;">
         <div class="qty-checkout">
@@ -219,7 +242,7 @@ function abrirProdutoModal(id) {
         </div>
         <button class="btn" style="flex:1;" onclick="addCarrinho('${p.id}', parseInt(document.getElementById('mQty').value))">Adicionar</button>
       </div>
-      ` : `<p style="color:var(--perigo); font-weight:700; margin-top:16px;">Indisponível</p>`}
+      ` : `<p style="color:var(--perigo); font-weight:700; margin-top:16px;">Produto Indisponível</p>`}
     </div>`;
   modal.classList.add("open");
 }
@@ -242,7 +265,7 @@ function initProdutos() {
   renderFilter();
 }
 
-/* ==================== CHECKOUT ==================== */
+/* ==================== CHECKOUT E PIX ==================== */
 let checkoutState = { metodo: null, quando: null };
 let pedidoPixIdGlobal = null;
 
@@ -253,9 +276,7 @@ function initCheckout() {
   
   renderCheckout();
   
-  const methodsOnline = [
-    { value: "pix_online", label: "PIX Online", desc: "Aprovação imediata", icon: ICONS.pix }
-  ];
+  const methodsOnline = [{ value: "pix_online", label: "PIX Online", desc: "Aprovação imediata", icon: ICONS.pix }];
   const methodsDelivery = [
     { value: "pix_entrega", label: "PIX na Entrega", desc: "Pague na entrega", icon: ICONS.pix },
     { value: "credito_entrega", label: "Crédito", desc: "Maquininha na entrega", icon: ICONS.card },
@@ -294,17 +315,17 @@ function renderCheckout() {
   $("#checkoutItems").innerHTML = itens.map(i => `
     <div class="co-item">
       <div class="co-item-img">${i.imagem ? `<img src="${esc(i.imagem)}">` : ""}</div>
-      <div style="flex:1;"><strong>${esc(i.nome)}</strong><br><small class="muted">${money(i.preco)}</small></div>
+      <div style="flex:1;"><strong>${esc(i.nome)}</strong><br><small class="muted">${money(i.precoFinal)}</small></div>
       <div class="qty-checkout">
         <button onclick="alterarQtd('${i.id}', -1)">−</button>
         <span>${i.qty}</span>
         <button onclick="alterarQtd('${i.id}', 1)">+</button>
       </div>
-      <strong style="margin: 0 16px;">${money(i.preco * i.qty)}</strong>
+      <strong style="margin: 0 16px;">${money(i.precoFinal * i.qty)}</strong>
       <button onclick="alterarQtd('${i.id}', -999)" class="del-btn">${ICONS.trash}</button>
     </div>`).join("");
 
-  $("#summaryItems").innerHTML = itens.map(i => `<div class="summary-row"><span>${i.qty}x ${esc(i.nome)}</span><span>${money(i.preco * i.qty)}</span></div>`).join("");
+  $("#summaryItems").innerHTML = itens.map(i => `<div class="summary-row"><span>${i.qty}x ${esc(i.nome)}</span><span>${money(i.precoFinal * i.qty)}</span></div>`).join("");
   
   const sub = cartTotal();
   $("#subTotal").textContent = money(sub);
@@ -366,7 +387,6 @@ async function finalizarPedido() {
   } catch (err) { showToast(err.message, "error"); btn.disabled = false; btn.textContent = "Confirmar Pedido"; }
 }
 
-/* ==================== PIX ==================== */
 function abrirModalPix(pedidoId, pixData) {
   pedidoPixIdGlobal = pedidoId;
   $("#pixQRCode").src = `data:image/jpeg;base64,${pixData.qr_code_base64}`;
@@ -444,7 +464,27 @@ async function init() {
 
   try {
     CONFIG = parseConfig(await carregarTxt("data/config.txt"));
-    PRODUTOS = (await API.getProdutos()).map(p => ({ id: p.id, nome: p.nome, preco: p.preco, categoria: p.categoria_nome || "", imagem: p.imagem_url || "", descricao: p.descricao_curta || p.descricao || "", estoque: p.estoque }));
+    
+    PRODUTOS = (await API.getProdutos()).map(p => {
+      const precoNormal = Number(p.preco);
+      const precoDesconto = p.preco_desconto ? Number(p.preco_desconto) : null;
+      const precoFinal = (precoDesconto && precoDesconto < precoNormal) ? precoDesconto : precoNormal;
+
+      return { 
+        id: p.id, 
+        nome: p.nome, 
+        preco: precoNormal, 
+        preco_desconto: precoDesconto,
+        precoFinal: precoFinal,
+        mais_vendido: p.mais_vendido || false,
+        vendas_totais: p.vendas_totais || 0,
+        criado_em: p.criado_em, 
+        categoria: p.categoria_nome || "", 
+        imagem: p.imagem_url || "", 
+        descricao: p.descricao_curta || p.descricao || "", 
+        estoque: p.estoque 
+      };
+    });
     
     renderHeader(); renderFooter();
 
